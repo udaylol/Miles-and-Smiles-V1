@@ -1,8 +1,10 @@
 import axios from "axios";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 export default function Login() {
   const [formData, setFormData] = useState({ username: "", password: "" });
+  const navigate = useNavigate();
 
   const handleChange = (e) =>
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -13,6 +15,10 @@ export default function Login() {
       .post(`http://localhost:3000/auth/login`, formData)
       .then((response) => {
         console.log("Login Successful:", response.data);
+        if (response.data?.token) {
+          localStorage.setItem("token", response.data.token);
+        }
+        navigate("/home");
       })
       .catch((error) => {
         console.error("Login Error:", error);
