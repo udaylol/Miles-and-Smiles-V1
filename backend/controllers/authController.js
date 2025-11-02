@@ -3,7 +3,8 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
 const JWT_SECRET = process.env.JWT_SECRET;
-
+console.log("JWT_SECRET inside controller:", process.env.JWT_SECRET);
+    
 export async function signup(req, res) {
 	try {
 		const { username, password } = req.body || {};

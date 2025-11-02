@@ -1,13 +1,14 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import Home from "../pages/Home.jsx";
 import Auth from "../pages/Auth.jsx";
+import ProtectedRoute from "../components/ProtectedRoute.jsx";
 
-function ProtectedRoute({ children }) {
-  // simple protection: require a token in localStorage
-  const token = localStorage.getItem("token");
-  if (!token) return <Navigate to="/" replace />;
-  return children;
-}
+// function ProtectedRoute({ children }) {
+//   // simple protection: require a token in localStorage
+//   const token = localStorage.getItem("token");
+//   if (!token) return <Navigate to="/" replace />;
+//   return children;
+// }
 
 function AppRouter() {
   return (
@@ -15,7 +16,7 @@ function AppRouter() {
       <Routes>
         <Route path="/" element={<Auth />} />
         <Route
-          path="/home"
+          path="/home"          
           element={
             <ProtectedRoute>
               <Home />

@@ -1,33 +1,44 @@
 import axios from "axios";
-import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 
 export default function Login() {
   const [formData, setFormData] = useState({ username: "", password: "" });
   const navigate = useNavigate();
 
+
   const handleChange = (e) =>
     setFormData({ ...formData, [e.target.name]: e.target.value });
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    axios
-      .post(`http://localhost:3000/auth/login`, formData)
-      .then((response) => {
-        console.log("Login Successful:", response.data);
-        if (response.data?.token) {
-          localStorage.setItem("token", response.data.token);
-        }
-        navigate("/home");
-      })
-      .catch((error) => {
-        console.error("Login Error:", error);
-      });
+  const handleLogin = async (e) => {
+    e.preventDefault(); // stop page reload
+
+    try {
+      const response = await axios.post(
+        "http://localhost:3000/auth/login",
+        formData
+      );
+
+      console.log("Login Successful:", response.data);
+
+      // ✅ 1. Save token to localStorage
+      localStorage.setItem("token", response.data.token);
+
+      // ✅ 2. Optionally save user info (like username)
+      localStorage.setItem("user", JSON.stringify(response.data.user));
+
+      // ✅ 3. Redirect to home page
+      navigate("/home");
+    } catch (error) {
+      console.error("Login Error:", error);
+      alert(error.response?.data?.message || "Login failed");
+    }
+
     console.log("Login Data:", formData);
   };
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col">
+    <form onSubmit={handleLogin} className="flex flex-col">
       <input
         type="text"
         name="username"
