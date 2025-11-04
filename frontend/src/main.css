@@ -2,21 +2,19 @@
 
 @layer base {
   :root {
-    /* 🌤️ Light - cozy beige/cottagecore */
-    --bg: #f6f0e8; /* warm cream */
-    --surface: #f0e3d3; /* pale beige */
-    --card: #fff6ea; /* ivory card */
-    --text: #4a3b2f; /* dark warm brown */
-    --muted: #8b6f5a; /* accent (soft oak) */
+    --bg: #f6f0e8;
+    --surface: #f0e3d3;
+    --card: #fff6ea;
+    --text: #4a3b2f;
+    --muted: #8b6f5a;
   }
 
   html.dark {
-    /* 🌙 Dark - candlelight cozy */
-    --bg: #1e1a16; /* deep espresso background */
-    --surface: #2a231d; /* mocha surface */
-    --card: #3a2f27; /* brownish-amber card */
-    --text: #f4e8d8; /* cream text */
-    --muted: #d1b08f; /* candlelight accent */
+    --bg: #1e1a16;
+    --surface: #2a231d;
+    --card: #3a2f27;
+    --text: #f4e8d8;
+    --muted: #d1b08f;
   }
 
   body {
