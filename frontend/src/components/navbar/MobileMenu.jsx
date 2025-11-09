@@ -2,7 +2,7 @@ import { Search, Users, Heart } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 export default function MobileMenu({
-  isLoggedIn,
+  isAuthenticated,
   onLogout,
   onLogin,
   menuOpen,
@@ -12,7 +12,7 @@ export default function MobileMenu({
 }) {
   if (!menuOpen) return null;
   const handleFavoritesToggle = () => {
-    if (!isLoggedIn) {
+    if (!isAuthenticated) {
       onLogin && onLogin();
       return;
     }
@@ -44,13 +44,13 @@ export default function MobileMenu({
           <Search className="text-(--muted) cursor-pointer" size={18} />
         </div>
         <div className="flex w-full justify-between">
-        {isLoggedIn && user && (
+        {isAuthenticated && user && (
           <div
             className="flex items-center w-32 px-2 py-1 cursor-pointer"
             onClick={handleProfileClick}
           >
             <img
-              src={user.pfp_url || "/profile.png"}
+              src={user.pfp_url || "/guestpfp.png"}
               alt={user.username || "profile"}
               className="w-8 h-8 rounded-full mr-3"
             />
@@ -80,7 +80,7 @@ export default function MobileMenu({
               size={18}
             />
           </button>
-          {isLoggedIn ? (
+          {isAuthenticated ? (
             <button
               onClick={onLogout}
               className="bg-red-500 hover:bg-red-600 text-white font-semibold px-3 py-1 rounded-md text-sm"

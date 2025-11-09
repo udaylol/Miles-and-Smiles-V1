@@ -76,7 +76,7 @@ const Navbar = () => {
         </button>
       </div>
       <MobileMenu
-        isLoggedIn={isAuthenticated}
+        isAuthenticated={isAuthenticated}
         onLogout={handleLogout}
         onLogin={handleLogin}
         menuOpen={menuOpen}
