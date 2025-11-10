@@ -5,6 +5,7 @@ import SearchBar from "./navbar/SearchBar.jsx";
 import Friends from "./navbar/Friends.jsx";
 import Favourites from "./navbar/Favourites.jsx";
 import ThemeToggle from "./navbar/ThemeToggle.jsx";
+import Profile from "./navbar/Profile.jsx";
 import AuthButtons from "./navbar/AuthButtons.jsx";
 import MobileMenu from "./navbar/MobileMenu.jsx";
 import { useNavigate } from "react-router-dom";
@@ -19,7 +20,9 @@ const Navbar = () => {
     logout();
     localStorage.setItem("showFavoritesOnly", "false");
     setShowFavoritesOnly(false);
-    window.dispatchEvent(new CustomEvent("favoritesFilterChange", { detail: false }));
+    window.dispatchEvent(
+      new CustomEvent("favoritesFilterChange", { detail: false })
+    );
     navigate("/");
   };
 
@@ -35,7 +38,7 @@ const Navbar = () => {
 
   return (
     <nav className="bg-(--surface) text-(--text) flex items-center justify-between px-4 md:px-6 py-3 shadow-md transition-colors duration-200 relative">
-  <Logo username={user?.username} isLoggedIn={isAuthenticated} />
+      <Logo username={user?.username} isLoggedIn={isAuthenticated} />
       <SearchBar />
       <div className="flex items-center space-x-3 md:space-x-4">
         <Friends />
@@ -46,24 +49,9 @@ const Navbar = () => {
         />
         <ThemeToggle />
 
-        {isAuthenticated && (
-          <div
-            onClick={() => navigate("/profile")}
-            className="hidden md:flex items-center space-x-2 cursor-pointer"
-            title={user ? user.username : "Profile"}
-          >
-            <img
-              src={user && user.pfp_url ? user.pfp_url : "/profile.png"}
-              alt="profile"
-              className="w-8 h-8 rounded-full"
-            />
-            <div className="hidden lg:flex flex-col text-left">
-              <span className="font-medium text-sm text-[--text]">{user?.username}</span>
-            </div>
-          </div>
-        )}
+        {isAuthenticated && <Profile user={user} />}
 
-  <AuthButtons isLoggedIn={isAuthenticated} onLogout={handleLogout} />
+        <AuthButtons isLoggedIn={isAuthenticated} onLogout={handleLogout} />
         <button
           onClick={toggleMenu}
           className="md:hidden p-2 hover:bg-(--card) rounded-full cursor-pointer"

@@ -2,7 +2,7 @@ import { Heart } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 
-export default function Favourites() {
+export default function Favourites({ mobileVisible = false }) {
   const navigate = useNavigate();
 
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(
@@ -27,14 +27,15 @@ export default function Favourites() {
     const newState = !showFavoritesOnly;
     setShowFavoritesOnly(newState);
     localStorage.setItem("showFavoritesOnly", newState.toString());
-
     window.dispatchEvent(
       new CustomEvent("favoritesFilterChange", { detail: newState })
     );
   };
 
+  const visibility = mobileVisible ? "flex md:hidden" : "hidden md:flex";
+
   return (
-    <div className="hidden md:flex items-center space-x-4">
+    <div className={`${visibility} items-center space-x-4`}>
       <button
         onClick={handleFavoritesToggle}
         className="p-2 hover:bg-(--card) rounded-full cursor-pointer"
@@ -46,7 +47,7 @@ export default function Favourites() {
           className={`${
             showFavoritesOnly ? "fill-red-500 text-red-500" : "text-(--muted)"
           } transition-colors duration-200`}
-          size={20}
+          size={mobileVisible ? 18 : 20}
         />
       </button>
     </div>
