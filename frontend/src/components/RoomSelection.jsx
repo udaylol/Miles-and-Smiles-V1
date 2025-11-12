@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
+import { useAuth } from "../context/AuthContext.jsx";
 import { useNavigate } from "react-router-dom";
 import { io } from "socket.io-client";
-import Navbar from "./Navbar.jsx";
 
 const VITE_BACKEND_SERVER = import.meta.env.VITE_BACKEND_SERVER;
 
@@ -15,6 +15,7 @@ const RoomSelection = ({ gameName, onRoomJoined }) => {
   const roomJoinedRef = useRef(false);
   const timeoutRef = useRef(null);
   const navigate = useNavigate();
+  const { token } = useAuth();
 
   useEffect(() => {
     const serverUrl = VITE_BACKEND_SERVER?.replace(/\/$/, "");
@@ -22,7 +23,13 @@ const RoomSelection = ({ gameName, onRoomJoined }) => {
 
     const newSocket = io(serverUrl, {
       auth: {
-        token: localStorage.getItem("token"),
+        token: (() => {
+          try {
+            return token;
+          } catch {
+            return null;
+          }
+        })(),
       },
       transports: ["websocket", "polling"],
     });
@@ -36,7 +43,6 @@ const RoomSelection = ({ gameName, onRoomJoined }) => {
       console.error("❌ Connection error:", error);
       setError("Failed to connect to server. Please check your connection.");
       setLoading(false);
-      // Check if it's an authentication error
       if (error.message?.includes("Authentication error")) {
         setError("Authentication failed. Please log in again.");
       }
@@ -59,7 +65,6 @@ const RoomSelection = ({ gameName, onRoomJoined }) => {
       console.log("✅ Room created:", data);
       setCreatedRoomCode(data.roomId);
       roomJoinedRef.current = true;
-      // Small delay to show room code before transitioning
       setTimeout(() => {
         onRoomJoined({ roomId: data.roomId, gameName, socket: newSocket });
       }, 3000);
@@ -89,11 +94,9 @@ const RoomSelection = ({ gameName, onRoomJoined }) => {
     });
 
     return () => {
-      // Clear timeout if component unmounts
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current);
       }
-      // Only disconnect if room wasn't joined (user navigated away)
       if (!roomJoinedRef.current) {
         console.log("Disconnecting socket");
         newSocket.disconnect();

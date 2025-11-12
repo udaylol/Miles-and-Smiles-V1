@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { useAuth } from "../context/AuthContext.jsx";
 
 const Chat = ({ socket, roomId }) => {
   const [messages, setMessages] = useState([]);
@@ -8,17 +9,12 @@ const Chat = ({ socket, roomId }) => {
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
 
+  const { user } = useAuth();
+
   useEffect(() => {
-    const userStr = localStorage.getItem("user");
-    if (userStr) {
-      try {
-        const user = JSON.parse(userStr);
-        setCurrentUserId(user.id);
-      } catch (e) {
-        console.error("Error parsing user data:", e);
-      }
-    }
-  }, []);
+    if (user?.id) setCurrentUserId(user.id);
+    else setCurrentUserId("");
+  }, [user]);
 
   useEffect(() => {
     if (!socket) return;

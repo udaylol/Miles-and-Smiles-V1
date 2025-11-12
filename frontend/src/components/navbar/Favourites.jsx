@@ -1,6 +1,7 @@
 import { Heart } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
+import { useAuth } from "../../context/AuthContext.jsx";
 
 export default function Favourites({ mobileVisible = false }) {
   const navigate = useNavigate();
@@ -9,15 +10,12 @@ export default function Favourites({ mobileVisible = false }) {
     () => localStorage.getItem("showFavoritesOnly") === "true"
   );
 
-  const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem("token"));
+  const { isAuthenticated } = useAuth();
+  const [isLoggedIn, setIsLoggedIn] = useState(!!isAuthenticated);
 
   useEffect(() => {
-    const handleStorageChange = () => {
-      setIsLoggedIn(!!localStorage.getItem("token"));
-    };
-    window.addEventListener("storage", handleStorageChange);
-    return () => window.removeEventListener("storage", handleStorageChange);
-  }, []);
+    setIsLoggedIn(!!isAuthenticated);
+  }, [isAuthenticated]);
 
   const handleFavoritesToggle = () => {
     if (!isLoggedIn) {

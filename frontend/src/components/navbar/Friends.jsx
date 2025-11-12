@@ -22,7 +22,7 @@ export default function Friends({ mobileVisible = false }) {
     try {
       const res = await axiosClient.get("/api/user/me");
       setUserData(res.data);
-      localStorage.setItem("user", JSON.stringify(res.data)); // optional sync
+      // intentionally avoid writing user to localStorage; keep in-memory only
     } catch (err) {
       console.error("❌ Error fetching user data:", err);
     }

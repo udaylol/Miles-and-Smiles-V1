@@ -1,11 +1,13 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import axiosClient from "../axiosClient";
+import { useAuth } from "../context/AuthContext.jsx";
 
-function ProfilePictureUploader({ token }) {
+function ProfilePictureUploader() {
   const [file, setFile] = useState(null);
   const [preview, setPreview] = useState("");
   const [uploadedUrl, setUploadedUrl] = useState("");
   const [loading, setLoading] = useState(false);
+  const { token, updateUser } = useAuth();
 
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
@@ -24,10 +26,7 @@ function ProfilePictureUploader({ token }) {
   try {
     setLoading(true);
     const res = await axiosClient.post("/api/user/profile-picture", formData, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-        Authorization: `Bearer ${token}`,
-      },
+      headers: { "Content-Type": "multipart/form-data" },
     });
 
     const newUrl = res.data.pfp_url;
@@ -35,10 +34,7 @@ function ProfilePictureUploader({ token }) {
     if (newUrl) {
       setUploadedUrl(newUrl);
 
-      // ✅ Update user object in localStorage
-      const user = JSON.parse(localStorage.getItem("user")) || {};
-      user.pfp_url = newUrl;
-      localStorage.setItem("user", JSON.stringify(user));
+  updateUser({ pfp_url: newUrl });
 
       alert("✅ Profile picture uploaded successfully!");
     } else {

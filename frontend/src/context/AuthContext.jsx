@@ -5,18 +5,15 @@ import {
   useState,
   useCallback,
 } from "react";
+import axiosClient from "../axiosClient";
 
 const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
+  // keep token in localStorage for cross-tab auth events and axios interceptor
   const [token, setToken] = useState(() => localStorage.getItem("token"));
-  const [user, setUser] = useState(() => {
-    try {
-      return JSON.parse(localStorage.getItem("user")) || null;
-    } catch {
-      return null;
-    }
-  });
+  // user will be fetched from backend /api/user/me to reduce localStorage dependence
+  const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(false);
 
   const applyAuth = useCallback((nextToken, nextUser) => {
@@ -28,13 +25,10 @@ export function AuthProvider({ children }) {
       setToken(null);
     }
 
-    if (nextUser) {
-      localStorage.setItem("user", JSON.stringify(nextUser));
-      setUser(nextUser);
-    } else {
-      localStorage.removeItem("user");
-      setUser(null);
-    }
+    // store user in memory only (do not persist to localStorage).
+    // callers can pass the user returned from login/signup to prefill UI.
+    if (nextUser) setUser(nextUser);
+    else setUser(null);
   }, []);
 
   const login = async (credentials, requestFn) => {
@@ -55,25 +49,56 @@ export function AuthProvider({ children }) {
   const updateUser = (partial) => {
     setUser((prev) => {
       const updated = { ...prev, ...partial };
-      localStorage.setItem("user", JSON.stringify(updated));
+      // notify listeners about user update (components can subscribe to context)
+      window.dispatchEvent(new CustomEvent("userUpdated", { detail: updated }));
       return updated;
     });
   };
 
   // Cross-tab sync
+  // Cross-tab sync for token changes. When token changes, fetch /api/user/me
   useEffect(() => {
-    const handleStorage = (e) => {
-      if (e.key === "token") setToken(localStorage.getItem("token"));
-      if (e.key === "user") {
-        try {
-          setUser(JSON.parse(localStorage.getItem("user")) || null);
-        } catch {
+    const handleStorage = async (e) => {
+      if (e.key === "token") {
+        const newToken = localStorage.getItem("token");
+        setToken(newToken);
+        if (newToken) {
+          try {
+            const res = await axiosClient.get("/api/user/me");
+            setUser(res.data);
+          } catch (err) {
+            console.error("Failed to fetch user on token change:", err);
+            setUser(null);
+          }
+        } else {
           setUser(null);
         }
       }
     };
+
     window.addEventListener("storage", handleStorage);
     return () => window.removeEventListener("storage", handleStorage);
+  }, []);
+
+  // On mount, if token exists, fetch current user from backend
+  useEffect(() => {
+    let mounted = true;
+    const init = async () => {
+      const t = localStorage.getItem("token");
+      if (!t) return;
+      try {
+        const res = await axiosClient.get("/api/user/me");
+        if (!mounted) return;
+        setUser(res.data);
+      } catch (err) {
+        console.error("Failed to fetch current user:", err);
+        setUser(null);
+      }
+    };
+    init();
+    return () => {
+      mounted = false;
+    };
   }, []);
 
   const value = {
