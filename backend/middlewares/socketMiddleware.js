@@ -1,5 +1,11 @@
 import jwt from "jsonwebtoken";
+
 const JWT_SECRET = process.env.JWT_SECRET;
+
+if (!JWT_SECRET) {
+  console.error("❌ JWT_SECRET environment variable is not set");
+  process.exit(1);
+}
 
 // Socket authentication middleware
 export function authenticateSocket(socket, next) {

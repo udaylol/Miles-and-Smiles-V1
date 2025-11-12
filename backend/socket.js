@@ -3,6 +3,11 @@ import jwt from "jsonwebtoken";
 
 const JWT_SECRET = process.env.JWT_SECRET;
 
+if (!JWT_SECRET) {
+  console.error("❌ JWT_SECRET environment variable is not set");
+  process.exit(1);
+}
+
 // Store rooms in memory (could be moved to database later)
 const rooms = new Map(); // roomId -> { gameName, players: [], maxPlayers: 2 }
 
@@ -177,24 +182,39 @@ export default function setupSocket(server) {
     // Handle leaving room
     socket.on("leave-room", ({ roomId }) => {
       try {
+        if (!roomId) {
+          socket.emit("room-error", { message: "Room ID is required" });
+          return;
+        }
+        
         const room = rooms.get(roomId);
-        if (room) {
-          room.players = room.players.filter((p) => p.socketId !== socket.id);
+        if (!room) {
+          socket.emit("room-error", { message: "Room not found" });
+          return;
+        }
+        
+        // Verify user is actually in the room
+        const playerInRoom = room.players.some((p) => p.socketId === socket.id);
+        if (!playerInRoom) {
+          socket.emit("room-error", { message: "You are not in this room" });
+          return;
+        }
+        
+        room.players = room.players.filter((p) => p.socketId !== socket.id);
 
-          if (room.players.length === 0) {
-            // Delete room if empty
-            rooms.delete(roomId);
-            console.log(`Room ${roomId} deleted (empty)`);
-          } else {
-            // Notify other players
-            socket.to(roomId).emit("player-left", {
-              player: {
-                id: socket.userId,
-                username: socket.username,
-              },
-              players: room.players,
-            });
-          }
+        if (room.players.length === 0) {
+          // Delete room if empty
+          rooms.delete(roomId);
+          console.log(`Room ${roomId} deleted (empty)`);
+        } else {
+          // Notify other players
+          socket.to(roomId).emit("player-left", {
+            player: {
+              id: socket.userId,
+              username: socket.username,
+            },
+            players: room.players,
+          });
         }
 
         socket.leave(roomId);

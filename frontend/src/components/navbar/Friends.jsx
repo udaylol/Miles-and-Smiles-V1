@@ -71,8 +71,88 @@ export default function Friends({ mobileVisible = false }) {
     }
   };
 
-  // Render a list of users
-  const renderUserList = (users, emptyText) => {
+  // --- Accept Friend Request ---
+  const handleAcceptRequest = async (requesterId) => {
+    try {
+      setLoading(true);
+      const res = await axiosClient.post("/api/user/friends/accept", {
+        userId: requesterId,
+      });
+      setMessage(res.data.message || "Friend request accepted!");
+      await fetchUserData();
+    } catch (err) {
+      console.error("❌ Error accepting friend request:", err);
+      const errMsg =
+        err.response?.data?.message || "Failed to accept friend request";
+      setMessage(errMsg);
+    } finally {
+      setLoading(false);
+      setTimeout(() => setMessage(""), 3000);
+    }
+  };
+
+  // --- Reject Friend Request ---
+  const handleRejectRequest = async (requesterId) => {
+    try {
+      setLoading(true);
+      const res = await axiosClient.post("/api/user/friends/reject", {
+        userId: requesterId,
+      });
+      setMessage(res.data.message || "Friend request rejected");
+      await fetchUserData();
+    } catch (err) {
+      console.error("❌ Error rejecting friend request:", err);
+      const errMsg =
+        err.response?.data?.message || "Failed to reject friend request";
+      setMessage(errMsg);
+    } finally {
+      setLoading(false);
+      setTimeout(() => setMessage(""), 3000);
+    }
+  };
+
+  // --- Cancel Friend Request ---
+  const handleCancelRequest = async (targetId) => {
+    try {
+      setLoading(true);
+      const res = await axiosClient.post("/api/user/friends/cancel", {
+        userId: targetId,
+      });
+      setMessage(res.data.message || "Friend request cancelled");
+      await fetchUserData();
+    } catch (err) {
+      console.error("❌ Error cancelling friend request:", err);
+      const errMsg =
+        err.response?.data?.message || "Failed to cancel friend request";
+      setMessage(errMsg);
+    } finally {
+      setLoading(false);
+      setTimeout(() => setMessage(""), 3000);
+    }
+  };
+
+  // --- Remove Friend ---
+  const handleRemoveFriend = async (friendId) => {
+    try {
+      setLoading(true);
+      const res = await axiosClient.post("/api/user/friends/remove", {
+        userId: friendId,
+      });
+      setMessage(res.data.message || "Friend removed");
+      await fetchUserData();
+    } catch (err) {
+      console.error("❌ Error removing friend:", err);
+      const errMsg =
+        err.response?.data?.message || "Failed to remove friend";
+      setMessage(errMsg);
+    } finally {
+      setLoading(false);
+      setTimeout(() => setMessage(""), 3000);
+    }
+  };
+
+  // Render friends list with Remove button
+  const renderFriends = (users, emptyText) => {
     if (!users || users.length === 0) {
       return (
         <p className="text-sm text-[--muted-foreground]">{emptyText}</p>
@@ -81,23 +161,130 @@ export default function Friends({ mobileVisible = false }) {
 
     return (
       <ul className="space-y-2">
-        {users.map((u) => (
-          <li
-            key={u._id || u.userId || u}
-            className="flex items-center gap-3 p-2 rounded-md bg-[--surface]"
-          >
-            {u.pfp_url && (
-              <img
-                src={u.pfp_url}
-                alt={u.username}
-                className="w-8 h-8 rounded-full object-cover"
-              />
-            )}
-            <span className="text-[--foreground]">
-              {u.username || u}
-            </span>
-          </li>
-        ))}
+        {users.map((u) => {
+          const userId = u._id || u.userId || u;
+          return (
+            <li
+              key={userId}
+              className="flex items-center justify-between gap-3 p-2 rounded-md bg-[--surface]"
+            >
+              <div className="flex items-center gap-3 flex-1 min-w-0">
+                {u.pfp_url && (
+                  <img
+                    src={u.pfp_url}
+                    alt={u.username}
+                    className="w-8 h-8 rounded-full object-cover flex-shrink-0"
+                  />
+                )}
+                <span className="text-[--foreground] truncate">
+                  {u.username || u}
+                </span>
+              </div>
+              <button
+                onClick={() => handleRemoveFriend(userId)}
+                disabled={loading}
+                className="px-2 py-1 text-xs bg-red-500 text-white rounded hover:bg-red-600 transition disabled:opacity-50 flex-shrink-0"
+              >
+                Remove
+              </button>
+            </li>
+          );
+        })}
+      </ul>
+    );
+  };
+
+  // Render incoming requests with Accept/Reject buttons
+  const renderIncomingRequests = (users, emptyText) => {
+    if (!users || users.length === 0) {
+      return (
+        <p className="text-sm text-[--muted-foreground]">{emptyText}</p>
+      );
+    }
+
+    return (
+      <ul className="space-y-2">
+        {users.map((u) => {
+          const userId = u._id || u.userId || u;
+          return (
+            <li
+              key={userId}
+              className="flex items-center justify-between gap-3 p-2 rounded-md bg-[--surface]"
+            >
+              <div className="flex items-center gap-3 flex-1 min-w-0">
+                {u.pfp_url && (
+                  <img
+                    src={u.pfp_url}
+                    alt={u.username}
+                    className="w-8 h-8 rounded-full object-cover flex-shrink-0"
+                  />
+                )}
+                <span className="text-[--foreground] truncate">
+                  {u.username || u}
+                </span>
+              </div>
+              <div className="flex gap-2 flex-shrink-0">
+                <button
+                  onClick={() => handleAcceptRequest(userId)}
+                  disabled={loading}
+                  className="px-2 py-1 text-xs bg-green-500 text-white rounded hover:bg-green-600 transition disabled:opacity-50"
+                >
+                  Accept
+                </button>
+                <button
+                  onClick={() => handleRejectRequest(userId)}
+                  disabled={loading}
+                  className="px-2 py-1 text-xs bg-red-500 text-white rounded hover:bg-red-600 transition disabled:opacity-50"
+                >
+                  Reject
+                </button>
+              </div>
+            </li>
+          );
+        })}
+      </ul>
+    );
+  };
+
+  // Render outgoing requests with Cancel button
+  const renderOutgoingRequests = (users, emptyText) => {
+    if (!users || users.length === 0) {
+      return (
+        <p className="text-sm text-[--muted-foreground]">{emptyText}</p>
+      );
+    }
+
+    return (
+      <ul className="space-y-2">
+        {users.map((u) => {
+          const userId = u._id || u.userId || u;
+          return (
+            <li
+              key={userId}
+              className="flex items-center justify-between gap-3 p-2 rounded-md bg-[--surface]"
+            >
+              <div className="flex items-center gap-3 flex-1 min-w-0">
+                {u.pfp_url && (
+                  <img
+                    src={u.pfp_url}
+                    alt={u.username}
+                    className="w-8 h-8 rounded-full object-cover flex-shrink-0"
+                  />
+                )}
+                <span className="text-[--foreground] truncate">
+                  {u.username || u}
+                </span>
+              </div>
+              <button
+                onClick={() => handleCancelRequest(userId)}
+                disabled={loading}
+                className="px-2 py-1 text-xs bg-gray-500 text-white rounded hover:bg-gray-600 transition disabled:opacity-50 flex-shrink-0"
+              >
+                Cancel
+              </button>
+            </li>
+          );
+        })}
       </ul>
     );
   };
@@ -163,7 +350,7 @@ export default function Friends({ mobileVisible = false }) {
                 <h3 className="font-medium text-sm mb-1 text-[--muted]">
                   Incoming Requests
                 </h3>
-                {renderUserList(
+                {renderIncomingRequests(
                   userData.incomingRequests,
                   "No incoming requests"
                 )}
@@ -173,7 +360,7 @@ export default function Friends({ mobileVisible = false }) {
                 <h3 className="font-medium text-sm mb-1 text-[--muted]">
                   Outgoing Requests
                 </h3>
-                {renderUserList(
+                {renderOutgoingRequests(
                   userData.outgoingRequests,
                   "No outgoing requests"
                 )}
@@ -183,7 +370,7 @@ export default function Friends({ mobileVisible = false }) {
                 <h3 className="font-medium text-sm mb-1 text-[--muted]">
                   Your Friends
                 </h3>
-                {renderUserList(userData.friends, "You have no friends yet")}
+                {renderFriends(userData.friends, "You have no friends yet")}
               </section>
             </div>
           ) : (
