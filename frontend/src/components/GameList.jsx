@@ -89,13 +89,12 @@ const GameList = () => {
     if (query.trim()) {
       const lower = query.toLowerCase();
       gamesToShow = gamesToShow.filter((game) =>
-        game.title.toLowerCase().startsWith(lower)
+        game.title && game.title.toLowerCase().startsWith(lower)
       );
     }
 
     return gamesToShow;
   }, [allGames, favoriteGames, showFavoritesOnly, isAuthenticated, query]);
-
   // ✅ Render
   return (
     <div className="w-full px-4 py-8 flex gap-6 flex-wrap justify-center">
@@ -107,6 +106,12 @@ const GameList = () => {
             title={game.title}
           />
         ))
+      ) : showFavoritesOnly && query.trim() && isAuthenticated ? (
+        <div className="w-full text-center py-12">
+          <p className="text-[--muted] text-lg">
+            No favorite games match your search.
+          </p>
+        </div>
       ) : showFavoritesOnly && isAuthenticated ? (
         <div className="w-full text-center py-12">
           <p className="text-[--muted] text-lg">
