@@ -7,12 +7,28 @@ export default function Friends({ mobileVisible = false }) {
   const [search, setSearch] = useState("");
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
+  const [userData, setUserData] = useState(null);
   const ref = useRef(null);
 
   const visibility = mobileVisible ? "flex md:hidden" : "hidden md:flex";
   const iconSize = mobileVisible ? 18 : 20;
 
-  // close popup when clicking outside
+  // Fetch user info when panel opens
+  useEffect(() => {
+    if (open) fetchUserData();
+  }, [open]);
+
+  const fetchUserData = async () => {
+    try {
+      const res = await axiosClient.get("/api/user/me");
+      setUserData(res.data);
+      localStorage.setItem("user", JSON.stringify(res.data)); // optional sync
+    } catch (err) {
+      console.error("❌ Error fetching user data:", err);
+    }
+  };
+
+  // Close popup when clicking outside
   useEffect(() => {
     function handleClickOutside(e) {
       if (ref.current && !ref.current.contains(e.target)) {
@@ -35,13 +51,15 @@ export default function Friends({ mobileVisible = false }) {
       setLoading(true);
       setMessage("");
 
-      // ✅ Only send target username
       const res = await axiosClient.post("/api/user/friends", {
         username: search.trim(),
       });
 
       setMessage(res.data.message || "Friend request sent!");
       setSearch("");
+
+      // Refresh user info after sending
+      await fetchUserData();
     } catch (err) {
       console.error("❌ Error sending friend request:", err);
       const errMsg =
@@ -51,6 +69,37 @@ export default function Friends({ mobileVisible = false }) {
       setLoading(false);
       setTimeout(() => setMessage(""), 3000);
     }
+  };
+
+  // Render a list of users
+  const renderUserList = (users, emptyText) => {
+    if (!users || users.length === 0) {
+      return (
+        <p className="text-sm text-[--muted-foreground]">{emptyText}</p>
+      );
+    }
+
+    return (
+      <ul className="space-y-2">
+        {users.map((u) => (
+          <li
+            key={u._id || u.userId || u}
+            className="flex items-center gap-3 p-2 rounded-md bg-[--surface]"
+          >
+            {u.pfp_url && (
+              <img
+                src={u.pfp_url}
+                alt={u.username}
+                className="w-8 h-8 rounded-full object-cover"
+              />
+            )}
+            <span className="text-[--foreground]">
+              {u.username || u}
+            </span>
+          </li>
+        ))}
+      </ul>
+    );
   };
 
   return (
@@ -107,35 +156,41 @@ export default function Friends({ mobileVisible = false }) {
             </div>
           )}
 
-          {/* Placeholder sections */}
-          <div className="space-y-3 max-h-80 overflow-y-auto pr-2">
-            <section>
-              <h3 className="font-medium text-sm mb-1 text-[--muted]">
-                Incoming Requests
-              </h3>
-              <p className="text-sm text-[--muted-foreground]">
-                No incoming requests
-              </p>
-            </section>
+          {/* Sections */}
+          {userData ? (
+            <div className="space-y-3 max-h-80 overflow-y-auto pr-2">
+              <section>
+                <h3 className="font-medium text-sm mb-1 text-[--muted]">
+                  Incoming Requests
+                </h3>
+                {renderUserList(
+                  userData.incomingRequests,
+                  "No incoming requests"
+                )}
+              </section>
 
-            <section>
-              <h3 className="font-medium text-sm mb-1 text-[--muted]">
-                Outgoing Requests
-              </h3>
-              <p className="text-sm text-[--muted-foreground]">
-                No outgoing requests
-              </p>
-            </section>
+              <section>
+                <h3 className="font-medium text-sm mb-1 text-[--muted]">
+                  Outgoing Requests
+                </h3>
+                {renderUserList(
+                  userData.outgoingRequests,
+                  "No outgoing requests"
+                )}
+              </section>
 
-            <section>
-              <h3 className="font-medium text-sm mb-1 text-[--muted]">
-                Your Friends
-              </h3>
-              <p className="text-sm text-[--muted-foreground]">
-                You have no friends yet
-              </p>
-            </section>
-          </div>
+              <section>
+                <h3 className="font-medium text-sm mb-1 text-[--muted]">
+                  Your Friends
+                </h3>
+                {renderUserList(userData.friends, "You have no friends yet")}
+              </section>
+            </div>
+          ) : (
+            <p className="text-sm text-center text-[--muted-foreground]">
+              Loading...
+            </p>
+          )}
         </div>
       )}
     </div>

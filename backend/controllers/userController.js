@@ -142,3 +142,22 @@ export const sendFriendRequest = async (req, res) => {
     res.status(500).json({ message: "Server error while sending request" });
   }
 };
+
+
+export const getMe = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id)
+      .populate("friends", "username pfp_url") // ✅ friends with name & pic
+      .populate("incomingRequests", "username pfp_url") // ✅ incoming
+      .populate("outgoingRequests", "username pfp_url") // ✅ outgoing
+      .lean(); // makes it easier to strip password, etc.
+
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    const { password, ...safeUser } = user; // remove password if present
+    res.json(safeUser);
+  } catch (err) {
+    console.error("get /me error:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+}
