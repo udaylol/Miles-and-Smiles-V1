@@ -58,6 +58,11 @@ export async function toggleFavorite(req, res) {
 export async function uploadProfilePicture(req, res) {
   try {
     const userId = req.user.id;
+    
+    if (!req.file) {
+      return res.status(400).json({ message: "No file uploaded." });
+    }
+    
     const imageUrl = req.file.path;
 
     const user = await User.findByIdAndUpdate(

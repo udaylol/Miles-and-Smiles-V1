@@ -97,12 +97,22 @@ const RoomSelection = ({ gameName, onRoomJoined }) => {
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current);
       }
+      // Remove all event listeners to prevent memory leaks
+      newSocket.off("connect");
+      newSocket.off("connect_error");
+      newSocket.off("disconnect");
+      newSocket.off("room-created");
+      newSocket.off("room-joined");
+      newSocket.off("room-error");
+      newSocket.off("room-not-found");
+      newSocket.off("room-full");
+      
       if (!roomJoinedRef.current) {
         console.log("Disconnecting socket");
         newSocket.disconnect();
       }
     };
-  }, [gameName, onRoomJoined]);
+  }, [gameName, onRoomJoined, token]);
 
   const handleCreateRoom = () => {
     if (!socket || !socket.connected) {
