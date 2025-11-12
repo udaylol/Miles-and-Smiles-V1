@@ -2,23 +2,41 @@
 
 @layer base {
   :root {
+    /* Light mode */
     --bg: #f6f0e8;
     --surface: #f0e3d3;
     --card: #fff6ea;
     --text: #4a3b2f;
     --muted: #8b6f5a;
+    --background: var(--bg);
+    --foreground: var(--text);
+    --border: #d7c6b5;
+    --muted-foreground: #9b826a;
+    --input: #f8efe2;
+    --primary: #c08956;
   }
 
   html.dark {
+    /* Dark mode */
     --bg: #1e1a16;
     --surface: #2a231d;
     --card: #3a2f27;
     --text: #f4e8d8;
     --muted: #d1b08f;
+    --background: var(--bg);
+    --foreground: var(--text);
+    --border: #4b3b30;
+    --muted-foreground: #b89c81;
+    --input: #3a2f27;
+    --primary: #d4a373;
   }
 
   body {
     background-color: var(--bg);
     color: var(--text);
+  }
+
+  * {
+    transition: background-color 0.25s ease, color 0.25s ease;
   }
 }

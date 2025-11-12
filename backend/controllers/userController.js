@@ -79,3 +79,66 @@ export async function uploadProfilePicture(req, res) {
     res.status(500).json({ message: "Image upload failed" });
   }
 }
+
+export const sendFriendRequest = async (req, res) => {
+  try {
+    const { username } = req.body; // the target username
+    const senderId = req.user.id;  // extracted from JWT middleware
+
+    // find sender and receiver
+    const sender = await User.findById(senderId);
+    const receiver = await User.findOne({ username });
+
+    // 1️⃣ check if receiver exists
+    if (!receiver) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // 2️⃣ prevent self requests
+    if (receiver._id.equals(sender._id)) {
+      return res.status(400).json({ message: "You cannot send a request to yourself" });
+    }
+
+    // 3️⃣ check if already friends
+    if (sender.friends.includes(receiver._id)) {
+      return res.status(400).json({ message: "You are already friends" });
+    }
+
+    // 4️⃣ check if request already sent
+    if (sender.outgoingRequests.includes(receiver._id)) {
+      return res.status(400).json({ message: "Friend request already sent" });
+    }
+
+    // 5️⃣ check if receiver already sent you one (then they should be friends instead)
+    if (sender.incomingRequests.includes(receiver._id)) {
+      // auto-accept the friend request
+      sender.friends.push(receiver._id);
+      receiver.friends.push(sender._id);
+
+      // remove old requests
+      sender.incomingRequests = sender.incomingRequests.filter(
+        (id) => !id.equals(receiver._id)
+      );
+      receiver.outgoingRequests = receiver.outgoingRequests.filter(
+        (id) => !id.equals(sender._id)
+      );
+
+      await sender.save();
+      await receiver.save();
+
+      return res.json({ message: "Friend request accepted! You are now friends." });
+    }
+
+    // 6️⃣ otherwise, create new friend request
+    sender.outgoingRequests.push(receiver._id);
+    receiver.incomingRequests.push(sender._id);
+
+    await sender.save();
+    await receiver.save();
+
+    res.json({ message: "Friend request sent!" });
+  } catch (err) {
+    console.error("Error sending friend request:", err);
+    res.status(500).json({ message: "Server error while sending request" });
+  }
+};
