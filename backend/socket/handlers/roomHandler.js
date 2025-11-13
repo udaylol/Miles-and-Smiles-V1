@@ -13,7 +13,7 @@ import { generateRoomCode } from "../game/helpers.js";
  * @param {Function} onGameStart - Callback when game should start (roomId, room)
  * @param {Function} onPlayerLeave - Callback when player leaves (socket, roomId, games)
  */
-export function setupRoomHandler(socket, io, rooms, onGameStart, onPlayerLeave) {
+export function setupRoomHandler(socket, io, rooms, onGameStart, onPlayerLeave, connectedUsers) {
   // Handle room creation
   socket.on("create-room", ({ gameName }, callback) => {
     try {
@@ -56,6 +56,16 @@ export function setupRoomHandler(socket, io, rooms, onGameStart, onPlayerLeave) 
       };
 
       rooms.set(roomId, room);
+      // update connectedUsers map if provided
+      if (connectedUsers) {
+        connectedUsers.set(socket.userId, {
+          socketId: socket.id,
+          roomId,
+          role: null,
+          online: true,
+          lastSeen: Date.now(),
+        });
+      }
       socket.join(roomId);
       socket.currentRoom = roomId;
 
@@ -115,6 +125,16 @@ export function setupRoomHandler(socket, io, rooms, onGameStart, onPlayerLeave) 
         socketId: socket.id,
       });
 
+      if (connectedUsers) {
+        connectedUsers.set(socket.userId, {
+          socketId: socket.id,
+          roomId,
+          role: null,
+          online: true,
+          lastSeen: Date.now(),
+        });
+      }
+
       socket.join(roomId);
       socket.currentRoom = roomId;
 
@@ -166,7 +186,7 @@ export function setupRoomHandler(socket, io, rooms, onGameStart, onPlayerLeave) 
         return;
       }
 
-      // Handle game cleanup if player is leaving during active game
+      // Handle game cleanup if player is leaving during active game (intentional leave)
       if (onPlayerLeave) {
         onPlayerLeave(socket, roomId);
       }
@@ -190,6 +210,16 @@ export function setupRoomHandler(socket, io, rooms, onGameStart, onPlayerLeave) 
 
       socket.leave(roomId);
       socket.currentRoom = null;
+      // update connectedUsers
+      if (connectedUsers) {
+        connectedUsers.set(socket.userId, {
+          socketId: null,
+          roomId: null,
+          role: null,
+          online: false,
+          lastSeen: Date.now(),
+        });
+      }
       console.log(`User ${socket.username} left room ${roomId}`);
     } catch (error) {
       console.error("Error leaving room:", error);
@@ -218,34 +248,9 @@ export function handleRoomLeave(socket, roomId, games, onPlayerLeave) {
  * @param {Function} onPlayerLeave - Callback for game-specific cleanup
  */
 export function handleRoomDisconnect(socket, rooms, games, onPlayerLeave) {
-  // Remove user from all rooms
-  if (socket.currentRoom) {
-    const room = rooms.get(socket.currentRoom);
-    if (room) {
-      // Handle game cleanup if player is disconnecting during active game
-      if (onPlayerLeave) {
-        onPlayerLeave(socket, socket.currentRoom, games);
-      }
-
-      room.players = room.players.filter((p) => p.socketId !== socket.id);
-
-      if (room.players.length === 0) {
-        // Delete room and any associated game if empty
-        rooms.delete(socket.currentRoom);
-        games.delete(socket.currentRoom);
-        console.log(
-          `Room ${socket.currentRoom} deleted (empty after disconnect)`
-        );
-      } else {
-        socket.to(socket.currentRoom).emit("player-left", {
-          player: {
-            id: socket.userId,
-            username: socket.username,
-          },
-          players: room.players,
-        });
-      }
-    }
-  }
+  // NOTE: disconnect should NOT remove players or delete game state immediately.
+  // Brief network glitches should be tolerated. This function remains no-op
+  // because disconnect handling is performed in socket.js to mark players offline.
+  return;
 }
 

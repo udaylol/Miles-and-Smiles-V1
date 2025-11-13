@@ -86,9 +86,10 @@ function isBoardFull(board) {
 export class TicTacToeGame {
   constructor(players) {
     this.board = createEmptyBoard();
+    // Store both userId and socketId for each symbol to support reconnects
     this.players = {
-      X: players[0].socketId,
-      O: players[1].socketId,
+      X: { userId: players[0].id, socketId: players[0].socketId },
+      O: { userId: players[1].id, socketId: players[1].socketId },
     };
     this.turn = "X"; // First player (X) goes first
     this.winner = null; // null, "X", "O", or "draw"
@@ -191,9 +192,13 @@ export class TicTacToeGame {
    * @returns {Object} Game state object
    */
   getState() {
+    // Return a compact players mapping (symbol -> socketId) for compatibility with frontend
     return {
       board: this.board,
-      players: this.players,
+      players: {
+        X: this.players.X?.socketId || null,
+        O: this.players.O?.socketId || null,
+      },
       turn: this.turn,
       winner: this.winner,
     };
@@ -205,8 +210,33 @@ export class TicTacToeGame {
    * @returns {string|null} "X", "O", or null
    */
   getPlayerSymbol(socketId) {
-    if (this.players.X === socketId) return "X";
-    if (this.players.O === socketId) return "O";
+    if (this.players.X && this.players.X.socketId === socketId) return "X";
+    if (this.players.O && this.players.O.socketId === socketId) return "O";
+    return null;
+  }
+
+  /**
+   * Update the socketId for a given userId (used during reconnect)
+   * @param {string} userId
+   * @param {string} socketId
+   */
+  updateSocketIdForUser(userId, socketId) {
+    if (this.players.X && this.players.X.userId === userId) {
+      this.players.X.socketId = socketId;
+    }
+    if (this.players.O && this.players.O.userId === userId) {
+      this.players.O.socketId = socketId;
+    }
+  }
+
+  /**
+   * Get player symbol by userId
+   * @param {string} userId
+   * @returns {string|null}
+   */
+  getPlayerSymbolByUserId(userId) {
+    if (this.players.X && this.players.X.userId === userId) return "X";
+    if (this.players.O && this.players.O.userId === userId) return "O";
     return null;
   }
 }

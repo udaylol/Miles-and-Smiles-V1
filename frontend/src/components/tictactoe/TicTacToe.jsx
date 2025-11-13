@@ -25,6 +25,7 @@ function TicTacToe({ roomData }) {
     opponentLeft,
     error,
     isMyTurn,
+    isReconnecting,
     handleCellClick,
     handlePlayAgain,
   } = useTicTacToeGame(socket, roomId);
@@ -47,6 +48,7 @@ function TicTacToe({ roomData }) {
           isMyTurn={isMyTurn}
           error={error}
           socketConnected={socket?.connected}
+          isReconnecting={isReconnecting}
           onPlayAgain={handlePlayAgain}
         />
 

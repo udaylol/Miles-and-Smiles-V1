@@ -8,7 +8,7 @@ if (!JWT_SECRET) {
 }
 
 // Socket authentication middleware
-export function authenticateSocket(socket, next) {
+export default function authenticateSocket(socket, next) {
   const token = socket.handshake.auth?.token;
 
   if (!token) {

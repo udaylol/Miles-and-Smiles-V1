@@ -5,6 +5,7 @@
 
 import { useState, useEffect } from "react";
 import { setupSocketHandlers } from "./socketHandlers.js";
+import { useAuth } from "../../context/AuthContext.jsx";
 
 /**
  * Custom hook for TicTacToe game
@@ -25,9 +26,11 @@ export function useTicTacToeGame(socket, roomId) {
   const [gameStarted, setGameStarted] = useState(false);
   const [opponentLeft, setOpponentLeft] = useState(false);
   const [error, setError] = useState("");
+  const [isReconnecting, setIsReconnecting] = useState(false);
 
   // Determine if it's the current player's turn
-  const isMyTurn = gameStarted && turn === mySymbol && winner === null;
+  const isMyTurn = !isReconnecting && gameStarted && turn === mySymbol && winner === null;
+  const { user } = useAuth();
 
   // Set up Socket.IO event listeners
   useEffect(() => {
@@ -103,6 +106,31 @@ export function useTicTacToeGame(socket, roomId) {
       setError(data.message || "Your opponent has left the game");
     };
 
+    const handlePlayerOffline = (data) => {
+      console.log("⚠️ Player offline:", data);
+      setError("Opponent temporarily offline — reconnecting...");
+      setIsReconnecting(true);
+    };
+
+    const handlePlayerRejoined = (data) => {
+      console.log("✅ Player rejoined:", data);
+      setError("");
+      setIsReconnecting(false);
+    };
+
+    const handleGameSync = (data) => {
+      console.log("🔁 Game sync received:", data);
+      setBoard(data.board);
+      setTurn(data.turn);
+      setWinner(data.winner);
+      setGameStarted(true);
+      setOpponentLeft(false);
+
+      // Determine which symbol this player is after sync
+      if (data.players && data.players.X === socket.id) setMySymbol("X");
+      else if (data.players && data.players.O === socket.id) setMySymbol("O");
+    };
+
     // Handle game errors
     const handleGameError = (data) => {
       console.error("❌ Game error:", data);
@@ -118,10 +146,48 @@ export function useTicTacToeGame(socket, roomId) {
       onGameOver: handleGameOver,
       onGameDraw: handleGameDraw,
       onOpponentLeft: handleOpponentLeft,
+      onPlayerOffline: handlePlayerOffline,
+      onPlayerRejoined: handlePlayerRejoined,
+      onGameSync: handleGameSync,
       onGameError: handleGameError,
     });
 
-    return cleanup;
+    // Listen to reconnection lifecycle to show indicator and rejoin room
+    const onDisconnect = (reason) => {
+      console.log("Socket disconnected:", reason);
+      // Only show reconnecting if we were in a room
+      if (roomId) setIsReconnecting(true);
+    };
+
+    const onConnect = () => {
+      console.log("Socket connected (or reconnected)");
+      if (roomId) {
+        // Rejoin the same room on reconnect. We send only roomId; server derives userId.
+        socket.emit("rejoin-room", { roomId });
+      }
+      setIsReconnecting(false);
+    };
+
+    const onReconnectAttempt = () => {
+      console.log("Attempting to reconnect...");
+      if (roomId) setIsReconnecting(true);
+    };
+
+    socket.on("disconnect", onDisconnect);
+    socket.on("connect", onConnect);
+    if (socket.io && socket.io.on) socket.io.on("reconnect_attempt", onReconnectAttempt);
+
+    // Return combined cleanup
+    return () => {
+      try {
+        socket.off("disconnect", onDisconnect);
+        socket.off("connect", onConnect);
+        if (socket.io && socket.io.off) socket.io.off("reconnect_attempt", onReconnectAttempt);
+      } catch (e) {
+        /* ignore */
+      }
+      if (typeof cleanup === "function") cleanup();
+    };
   }, [socket]);
 
   /**

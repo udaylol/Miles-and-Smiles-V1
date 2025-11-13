@@ -12,7 +12,7 @@ import { TicTacToeGame } from "../game/ticTacToeGame.js";
  * @param {Map} games - Games map (roomId -> TicTacToeGame instance)
  * @param {Map} rooms - Rooms map (roomId -> room data)
  */
-export function setupTicTacToeHandler(socket, io, games, rooms) {
+export function setupTicTacToeHandler(socket, io, games, rooms, connectedUsers) {
   // Handle game reset (Play Again)
   socket.on("game:reset", ({ roomId }) => {
     try {

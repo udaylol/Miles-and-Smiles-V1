@@ -32,6 +32,9 @@ const RoomSelection = ({ gameName, onRoomJoined }) => {
         })(),
       },
       transports: ["websocket", "polling"],
+      autoConnect: true,
+      reconnectionAttempts: Infinity,
+      reconnectionDelay: 1000,
     });
 
     newSocket.on("connect", () => {
