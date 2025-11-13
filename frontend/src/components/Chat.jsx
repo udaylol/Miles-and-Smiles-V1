@@ -12,7 +12,9 @@ const Chat = ({ socket, roomId }) => {
   const { user } = useAuth();
 
   useEffect(() => {
-    if (user?.id) setCurrentUserId(user.id);
+    // Handle both _id (MongoDB) and id formats
+    if (user?._id) setCurrentUserId(user._id.toString());
+    else if (user?.id) setCurrentUserId(user.id.toString());
     else setCurrentUserId("");
   }, [user]);
 
@@ -161,7 +163,9 @@ const Chat = ({ socket, roomId }) => {
         <>
           <div className="flex-1 overflow-y-auto p-3 space-y-2 max-h-96 min-h-[200px]">
             {messages.map((msg) => {
-              const isOwnMessage = msg.userId === currentUserId;
+              // Compare user IDs as strings to handle ObjectId vs string comparisons
+              const msgUserId = msg.userId?.toString();
+              const isOwnMessage = msgUserId && msgUserId === currentUserId;
               const isSystem = msg.isSystem || msg.userId === "system";
 
               return (
