@@ -9,8 +9,8 @@ export default function AuthButtons({
   const navigate = useNavigate();
   const visibility = mobileVisible ? "block md:hidden" : "hidden md:block";
   const size = mobileVisible
-    ? "px-3 py-1 text-sm rounded-md"
-    : "px-4 py-2 text-base rounded-md";
+    ? "px-3 py-1 text-sm rounded-full"
+    : "px-4 py-2 text-base rounded-full";
 
   return isLoggedIn ? (
     <button
