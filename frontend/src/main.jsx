@@ -8,7 +8,7 @@ import { SearchProvider } from "./context/SearchContext.jsx"; // ✅ import new 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
     <AuthProvider>
-      <SearchProvider>  {/* ✅ Wrap App inside SearchProvider */}
+      <SearchProvider>
         <App />
       </SearchProvider>
     </AuthProvider>

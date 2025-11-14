@@ -32,8 +32,10 @@ export function setupSocketHandlers(socket, handlers) {
   if (onGameDraw) socket.on("game:draw", onGameDraw);
   if (onOpponentLeft) socket.on("game:opponent_left", onOpponentLeft);
   if (handlers.onGameSync) socket.on("game:sync", handlers.onGameSync);
-  if (handlers.onPlayerOffline) socket.on("player-offline", handlers.onPlayerOffline);
-  if (handlers.onPlayerRejoined) socket.on("player-rejoined", handlers.onPlayerRejoined);
+  if (handlers.onPlayerOffline)
+    socket.on("player-offline", handlers.onPlayerOffline);
+  if (handlers.onPlayerRejoined)
+    socket.on("player-rejoined", handlers.onPlayerRejoined);
   if (onGameError) socket.on("game:error", onGameError);
 
   // Return cleanup function
@@ -46,9 +48,10 @@ export function setupSocketHandlers(socket, handlers) {
     if (onGameDraw) socket.off("game:draw", onGameDraw);
     if (onOpponentLeft) socket.off("game:opponent_left", onOpponentLeft);
     if (handlers.onGameSync) socket.off("game:sync", handlers.onGameSync);
-    if (handlers.onPlayerOffline) socket.off("player-offline", handlers.onPlayerOffline);
-    if (handlers.onPlayerRejoined) socket.off("player-rejoined", handlers.onPlayerRejoined);
+    if (handlers.onPlayerOffline)
+      socket.off("player-offline", handlers.onPlayerOffline);
+    if (handlers.onPlayerRejoined)
+      socket.off("player-rejoined", handlers.onPlayerRejoined);
     if (onGameError) socket.off("game:error", onGameError);
   };
 }
-

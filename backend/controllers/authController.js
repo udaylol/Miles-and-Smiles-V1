@@ -16,7 +16,9 @@ export async function signup(req, res) {
   try {
     const { username, password } = req.body || {};
     if (!username || !password) {
-      return res.status(400).json({ message: "Username and password required." });
+      return res
+        .status(400)
+        .json({ message: "Username and password required." });
     }
 
     const existing = await User.findOne({ username });
@@ -50,7 +52,9 @@ export async function login(req, res) {
   try {
     const { username, password } = req.body || {};
     if (!username || !password) {
-      return res.status(400).json({ message: "Username and password required." });
+      return res
+        .status(400)
+        .json({ message: "Username and password required." });
     }
 
     const user = await User.findOne({ username });

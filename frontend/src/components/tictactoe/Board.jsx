@@ -39,4 +39,3 @@ function Board({ board, isMyTurn, winner, onCellClick }) {
 }
 
 export default Board;
-

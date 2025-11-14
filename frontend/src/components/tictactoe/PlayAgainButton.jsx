@@ -24,4 +24,3 @@ function PlayAgainButton({ onClick, variant = "win" }) {
 }
 
 export default PlayAgainButton;
-

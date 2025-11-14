@@ -29,7 +29,8 @@ export function useTicTacToeGame(socket, roomId) {
   const [isReconnecting, setIsReconnecting] = useState(false);
 
   // Determine if it's the current player's turn
-  const isMyTurn = !isReconnecting && gameStarted && turn === mySymbol && winner === null;
+  const isMyTurn =
+    !isReconnecting && gameStarted && turn === mySymbol && winner === null;
   const { user } = useAuth();
 
   // Set up Socket.IO event listeners
@@ -175,14 +176,16 @@ export function useTicTacToeGame(socket, roomId) {
 
     socket.on("disconnect", onDisconnect);
     socket.on("connect", onConnect);
-    if (socket.io && socket.io.on) socket.io.on("reconnect_attempt", onReconnectAttempt);
+    if (socket.io && socket.io.on)
+      socket.io.on("reconnect_attempt", onReconnectAttempt);
 
     // Return combined cleanup
     return () => {
       try {
         socket.off("disconnect", onDisconnect);
         socket.off("connect", onConnect);
-        if (socket.io && socket.io.off) socket.io.off("reconnect_attempt", onReconnectAttempt);
+        if (socket.io && socket.io.off)
+          socket.io.off("reconnect_attempt", onReconnectAttempt);
       } catch (e) {
         /* ignore */
       }
@@ -268,4 +271,3 @@ export function useTicTacToeGame(socket, roomId) {
     handlePlayAgain,
   };
 }
-

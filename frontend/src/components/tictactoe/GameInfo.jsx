@@ -52,7 +52,9 @@ function GameInfo({
       {/* Reconnecting banner */}
       {isReconnecting && (
         <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-300 dark:border-yellow-700 rounded-lg p-3 mb-4">
-          <p className="text-yellow-700 dark:text-yellow-200">⏳ Reconnecting…</p>
+          <p className="text-yellow-700 dark:text-yellow-200">
+            ⏳ Reconnecting…
+          </p>
         </div>
       )}
 
@@ -113,4 +115,3 @@ function GameInfo({
 }
 
 export default GameInfo;
-

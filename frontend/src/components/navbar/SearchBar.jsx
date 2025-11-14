@@ -1,7 +1,11 @@
 import { useState } from "react";
 import { Search } from "lucide-react";
 
-export default function SearchBar({ onChange, className = "", mobileVisible = false }) {
+export default function SearchBar({
+  onChange,
+  className = "",
+  mobileVisible = false,
+}) {
   const [query, setQuery] = useState("");
 
   const handleInput = (e) => {

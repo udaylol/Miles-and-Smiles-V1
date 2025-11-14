@@ -41,4 +41,3 @@ function Cell({ value, index, isClickable, onClick }) {
 }
 
 export default Cell;
-

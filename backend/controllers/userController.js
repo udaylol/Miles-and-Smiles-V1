@@ -58,11 +58,11 @@ export async function toggleFavorite(req, res) {
 export async function uploadProfilePicture(req, res) {
   try {
     const userId = req.user.id;
-    
+
     if (!req.file) {
       return res.status(400).json({ message: "No file uploaded." });
     }
-    
+
     const imageUrl = req.file.path;
 
     const user = await User.findByIdAndUpdate(
@@ -88,7 +88,7 @@ export async function uploadProfilePicture(req, res) {
 export const sendFriendRequest = async (req, res) => {
   try {
     const { username } = req.body; // the target username
-    const senderId = req.user.id;  // extracted from JWT middleware
+    const senderId = req.user.id; // extracted from JWT middleware
 
     // find sender and receiver
     const sender = await User.findById(senderId);
@@ -101,7 +101,9 @@ export const sendFriendRequest = async (req, res) => {
 
     // 2️⃣ prevent self requests
     if (receiver._id.equals(sender._id)) {
-      return res.status(400).json({ message: "You cannot send a request to yourself" });
+      return res
+        .status(400)
+        .json({ message: "You cannot send a request to yourself" });
     }
 
     // 3️⃣ check if already friends
@@ -131,7 +133,9 @@ export const sendFriendRequest = async (req, res) => {
       await sender.save();
       await receiver.save();
 
-      return res.json({ message: "Friend request accepted! You are now friends." });
+      return res.json({
+        message: "Friend request accepted! You are now friends.",
+      });
     }
 
     // 6️⃣ otherwise, create new friend request
@@ -147,7 +151,6 @@ export const sendFriendRequest = async (req, res) => {
     res.status(500).json({ message: "Server error while sending request" });
   }
 };
-
 
 // Accept an incoming friend request
 export const acceptFriendRequest = async (req, res) => {
@@ -349,4 +352,4 @@ export const getMe = async (req, res) => {
     console.error("get /me error:", err);
     res.status(500).json({ message: "Server error" });
   }
-}
+};

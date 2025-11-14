@@ -20,7 +20,9 @@ export default function Profile({ user, mobileVisible = false }) {
         className={`${imageSize} rounded-full`}
       />
       <div className={`${textVisible} flex-col text-left`}>
-        <span className="font-medium text-sm text-[--text]">{user.username}</span>
+        <span className="font-medium text-sm text-[--text]">
+          {user.username}
+        </span>
       </div>
     </div>
   );

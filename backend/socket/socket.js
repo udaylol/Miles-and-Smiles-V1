@@ -5,7 +5,10 @@
 
 import { Server } from "socket.io";
 import { setupChatHandler } from "./handlers/chatHandler.js";
-import { setupRoomHandler, handleRoomDisconnect } from "./handlers/roomHandler.js";
+import {
+  setupRoomHandler,
+  handleRoomDisconnect,
+} from "./handlers/roomHandler.js";
 import {
   setupTicTacToeHandler,
   startTicTacToeGame,
@@ -98,7 +101,9 @@ export default function setupSocket(server) {
         const player = room.players.find((p) => p.id === userId);
         if (!player) {
           // If player is not in the room, return a non-fatal rejoin-failed event
-          socket.emit("rejoin-failed", { message: "You are not a player in this room" });
+          socket.emit("rejoin-failed", {
+            message: "You are not a player in this room",
+          });
           return;
         }
 
@@ -151,7 +156,9 @@ export default function setupSocket(server) {
     // Handle disconnection
     socket.on("disconnect", (reason) => {
       try {
-        console.log(`User disconnected: ${socket.username} (${socket.userId}) - ${reason}`);
+        console.log(
+          `User disconnected: ${socket.username} (${socket.userId}) - ${reason}`
+        );
 
         // Mark user as temporarily offline and keep room/game state
         const cu = connectedUsers.get(socket.userId) || {};
@@ -185,7 +192,9 @@ export default function setupSocket(server) {
               setTimeout(() => {
                 const stillRoom = rooms.get(socket.currentRoom);
                 if (stillRoom && stillRoom.players.every((p) => p.offline)) {
-                  console.log(`Cleaning up idle room ${socket.currentRoom} after extended disconnect`);
+                  console.log(
+                    `Cleaning up idle room ${socket.currentRoom} after extended disconnect`
+                  );
                   rooms.delete(socket.currentRoom);
                   games.delete(socket.currentRoom);
                 }

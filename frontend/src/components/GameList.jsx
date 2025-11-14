@@ -65,11 +65,17 @@ const GameList = () => {
       }
     };
 
-    window.addEventListener("favoritesFilterChange", handleFavoritesFilterChange);
+    window.addEventListener(
+      "favoritesFilterChange",
+      handleFavoritesFilterChange
+    );
     window.addEventListener("favoritesUpdated", handleFavoritesUpdate);
 
     return () => {
-      window.removeEventListener("favoritesFilterChange", handleFavoritesFilterChange);
+      window.removeEventListener(
+        "favoritesFilterChange",
+        handleFavoritesFilterChange
+      );
       window.removeEventListener("favoritesUpdated", handleFavoritesUpdate);
     };
   }, [isAuthenticated, fetchFavorites]);
@@ -88,8 +94,8 @@ const GameList = () => {
     // 🔥 Real-time search filter (case-insensitive, startsWith)
     if (query.trim()) {
       const lower = query.toLowerCase();
-      gamesToShow = gamesToShow.filter((game) =>
-        game.title && game.title.toLowerCase().startsWith(lower)
+      gamesToShow = gamesToShow.filter(
+        (game) => game.title && game.title.toLowerCase().startsWith(lower)
       );
     }
 
@@ -100,11 +106,7 @@ const GameList = () => {
     <div className="w-full px-4 py-8 flex gap-6 flex-wrap justify-center">
       {displayedGames.length > 0 ? (
         displayedGames.map((game, i) => (
-          <GameCard
-            key={game._id || i}
-            image={game.image}
-            title={game.title}
-          />
+          <GameCard key={game._id || i} image={game.image} title={game.title} />
         ))
       ) : showFavoritesOnly && query.trim() && isAuthenticated ? (
         <div className="w-full text-center py-12">

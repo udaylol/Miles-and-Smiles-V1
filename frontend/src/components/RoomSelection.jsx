@@ -109,7 +109,7 @@ const RoomSelection = ({ gameName, onRoomJoined }) => {
       newSocket.off("room-error");
       newSocket.off("room-not-found");
       newSocket.off("room-full");
-      
+
       if (!roomJoinedRef.current) {
         console.log("Disconnecting socket");
         newSocket.disconnect();

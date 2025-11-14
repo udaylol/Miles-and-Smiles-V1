@@ -142,8 +142,7 @@ export default function Friends({ mobileVisible = false }) {
       await fetchUserData();
     } catch (err) {
       console.error("❌ Error removing friend:", err);
-      const errMsg =
-        err.response?.data?.message || "Failed to remove friend";
+      const errMsg = err.response?.data?.message || "Failed to remove friend";
       setMessage(errMsg);
     } finally {
       setLoading(false);
@@ -154,9 +153,7 @@ export default function Friends({ mobileVisible = false }) {
   // Render friends list with Remove button
   const renderFriends = (users, emptyText) => {
     if (!users || users.length === 0) {
-      return (
-        <p className="text-sm text-[--muted-foreground]">{emptyText}</p>
-      );
+      return <p className="text-sm text-[--muted-foreground]">{emptyText}</p>;
     }
 
     return (
@@ -197,9 +194,7 @@ export default function Friends({ mobileVisible = false }) {
   // Render incoming requests with Accept/Reject buttons
   const renderIncomingRequests = (users, emptyText) => {
     if (!users || users.length === 0) {
-      return (
-        <p className="text-sm text-[--muted-foreground]">{emptyText}</p>
-      );
+      return <p className="text-sm text-[--muted-foreground]">{emptyText}</p>;
     }
 
     return (
@@ -249,9 +244,7 @@ export default function Friends({ mobileVisible = false }) {
   // Render outgoing requests with Cancel button
   const renderOutgoingRequests = (users, emptyText) => {
     if (!users || users.length === 0) {
-      return (
-        <p className="text-sm text-[--muted-foreground]">{emptyText}</p>
-      );
+      return <p className="text-sm text-[--muted-foreground]">{emptyText}</p>;
     }
 
     return (
