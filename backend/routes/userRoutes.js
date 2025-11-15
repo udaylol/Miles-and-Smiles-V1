@@ -3,7 +3,8 @@ import { getFavorites, toggleFavorite } from "../controllers/userController.js";
 import { verifyToken } from "../middlewares/authMiddleware.js";
 import upload from "../middlewares/uploadMiddleware.js";
 import {
-  uploadProfilePicture,
+  updateProfilePicture,
+  updateUsername,
   sendFriendRequest,
   acceptFriendRequest,
   rejectFriendRequest,
@@ -16,11 +17,12 @@ const router = Router();
 
 router.get("/favorites", verifyToken, getFavorites);
 router.post("/favorites", verifyToken, toggleFavorite);
+router.post("/username", verifyToken, updateUsername);
 router.post(
   "/profile-picture",
   verifyToken,
   upload.single("image"),
-  uploadProfilePicture
+  updateProfilePicture
 );
 router.post("/friends", verifyToken, sendFriendRequest);
 router.post("/friends/accept", verifyToken, acceptFriendRequest);
