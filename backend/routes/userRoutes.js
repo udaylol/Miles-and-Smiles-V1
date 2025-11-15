@@ -3,7 +3,8 @@ import { getFavorites, toggleFavorite } from "../controllers/userController.js";
 import { verifyToken } from "../middlewares/authMiddleware.js";
 import upload from "../middlewares/uploadMiddleware.js";
 import {
-  uploadProfilePicture,
+  updateProfilePicture,
+  updateField,
   sendFriendRequest,
   acceptFriendRequest,
   rejectFriendRequest,
@@ -14,19 +15,21 @@ import {
 
 const router = Router();
 
+router.get("/me", verifyToken, getMe);
 router.get("/favorites", verifyToken, getFavorites);
+
 router.post("/favorites", verifyToken, toggleFavorite);
-router.post(
-  "/profile-picture",
-  verifyToken,
-  upload.single("image"),
-  uploadProfilePicture
-);
 router.post("/friends", verifyToken, sendFriendRequest);
 router.post("/friends/accept", verifyToken, acceptFriendRequest);
 router.post("/friends/reject", verifyToken, rejectFriendRequest);
 router.post("/friends/cancel", verifyToken, cancelFriendRequest);
 router.post("/friends/remove", verifyToken, removeFriend);
-router.get("/me", verifyToken, getMe);
+router.post(
+  "/profile-picture",
+  verifyToken,
+  upload.single("image"),
+  updateProfilePicture
+);
 
+router.put("/updateField", verifyToken, updateField);
 export default router;

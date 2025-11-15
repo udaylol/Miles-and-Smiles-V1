@@ -8,6 +8,13 @@ const userSchema = new Schema(
     password: { type: String, required: true },
     pfp_url: { type: String, default: "/guestpfp.png" },
 
+    gender: {
+      type: String,
+      enum: ["male", "female", "other", null],
+      default: null,
+    },
+    birthday: { type: Date, default: null },
+
     friends: [{ type: Schema.Types.ObjectId, ref: "User" }],
 
     incomingRequests: [{ type: Schema.Types.ObjectId, ref: "User" }],
