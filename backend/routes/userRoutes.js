@@ -17,7 +17,7 @@ const router = Router();
 
 router.get("/favorites", verifyToken, getFavorites);
 router.post("/favorites", verifyToken, toggleFavorite);
-router.post("/username", verifyToken, updateUsername);
+router.put("/username", verifyToken, updateUsername);
 router.post(
   "/profile-picture",
   verifyToken,

@@ -1,30 +1,31 @@
 import { useState } from "react";
 import axiosClient from "../axiosClient";
-import { useAuth } from "../context/AuthContext.jsx";
+import { useAuth } from "../context/AuthContext";
 
-function ProfilePictureUploader() {
+export default function ProfilePictureUploader() {
+  const { user, updateUser } = useAuth();
+
+  const [preview, setPreview] = useState(null);
   const [file, setFile] = useState(null);
-  const [preview, setPreview] = useState("");
-  const [uploadedUrl, setUploadedUrl] = useState("");
   const [loading, setLoading] = useState(false);
-  const { updateUser } = useAuth();
 
-  const handleFileChange = (e) => {
-    const selectedFile = e.target.files[0];
-    if (!selectedFile) return;
-    setFile(selectedFile);
-    setPreview(URL.createObjectURL(selectedFile));
+  const handleFile = (e) => {
+    const f = e.target.files[0];
+    if (!f) return;
+
+    setFile(f);
+    setPreview(URL.createObjectURL(f));
   };
 
-  const handleUpload = async (e) => {
-    e.preventDefault();
-    if (!file) return alert("Please select a file first!");
+  const handleUpload = async () => {
+    if (!file) return alert("Select a file first");
 
     const formData = new FormData();
     formData.append("image", file);
 
     try {
       setLoading(true);
+
       const res = await axiosClient.post(
         "/api/user/profile-picture",
         formData,
@@ -34,81 +35,45 @@ function ProfilePictureUploader() {
       );
 
       const newUrl = res.data.pfp_url;
+      updateUser({ pfp_url: newUrl });
+      setPreview(null);
+      setFile(null);
 
-      if (newUrl) {
-        setUploadedUrl(newUrl);
-        updateUser({ pfp_url: newUrl });
-        alert("✅ Profile picture uploaded successfully!");
-      } else {
-        alert("⚠️ Upload succeeded but no image URL returned from server.");
-      }
     } catch (err) {
-      console.error(err);
-      alert("❌ Upload failed");
+      console.log(err);
+      alert("Upload failed");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-950 text-gray-100">
-      <div className="w-full max-w-sm rounded-2xl bg-gray-900 p-8 shadow-xl border border-gray-800 text-center">
-        <h2 className="text-2xl font-semibold mb-6">Upload Profile Picture</h2>
+    <div className="flex items-start gap-4">
 
-        <label
-          htmlFor="fileInput"
-          className="cursor-pointer inline-block bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition"
-        >
-          Choose Image
+      {/* Current or preview */}
+      <img
+        src={preview || user?.pfp_url}
+        className="w-28 h-28 rounded-xl object-cover border border-gray-800 shadow"
+      />
+
+      <div className="space-y-3">
+        <label className="cursor-pointer text-sm bg-gray-800 px-3 py-1.5 rounded-md hover:bg-gray-700">
+          Change
+          <input type="file" className="hidden" accept="image/*" onChange={handleFile} />
         </label>
-        <input
-          id="fileInput"
-          type="file"
-          accept="image/*"
-          onChange={handleFileChange}
-          className="hidden"
-        />
 
-        {/* Preview */}
-        {preview && (
-          <div className="mt-6 flex flex-col items-center">
-            <img
-              src={preview}
-              alt="Preview"
-              className="w-28 h-28 rounded-full border-4 border-blue-600 shadow-md object-cover"
-            />
-            <p className="text-sm text-gray-400 mt-2">Preview</p>
-          </div>
-        )}
-
-        <button
-          onClick={handleUpload}
-          disabled={loading}
-          className={`mt-6 w-full py-2.5 rounded-lg font-semibold transition 
-          ${
-            loading
-              ? "bg-gray-700 text-gray-400 cursor-not-allowed"
-              : "bg-green-600 hover:bg-green-700 text-white"
-          }`}
-        >
-          {loading ? "Uploading..." : "Upload"}
-        </button>
-
-        {uploadedUrl && (
-          <div className="mt-8">
-            <p className="text-sm text-gray-400 mb-3">Uploaded Image</p>
-            <div className="flex flex-col items-center">
-              <img
-                src={uploadedUrl}
-                alt="Uploaded"
-                className="w-28 h-28 rounded-full border-4 border-green-600 object-cover shadow-lg"
-              />
-            </div>
-          </div>
+        {file && (
+          <button
+            disabled={loading}
+            onClick={handleUpload}
+            className={`block bg-blue-600 px-3 py-1.5 rounded-md text-sm hover:bg-blue-700 ${
+              loading && "opacity-50 cursor-not-allowed"
+            }`}
+          >
+            {loading ? "Uploading..." : "Upload"}
+          </button>
         )}
       </div>
     </div>
   );
 }
-
-export default ProfilePictureUploader;
