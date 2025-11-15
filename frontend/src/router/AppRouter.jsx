@@ -3,7 +3,7 @@ import Home from "../pages/Home.jsx";
 import Auth from "../pages/Auth.jsx";
 import GamePage from "../pages/GamePage.jsx";
 import ProtectedRoute from "../components/ProtectedRoute.jsx";
-import Profile from "../pages/Profile.jsx";
+import ProfilePage from "../pages/ProfilePage.jsx";
 
 function AppRouter() {
   return (
@@ -23,7 +23,7 @@ function AppRouter() {
           path="/profile"
           element={
             <ProtectedRoute>
-              <Profile />
+              <ProfilePage />
             </ProtectedRoute>
           }
         />

@@ -1,13 +1,9 @@
 import jwt from "jsonwebtoken";
+import User from "../models/User.js";
 
 const JWT_SECRET = process.env.JWT_SECRET;
 
-if (!JWT_SECRET) {
-  console.error("❌ JWT_SECRET environment variable is not set");
-  process.exit(1);
-}
-
-export function verifyToken(req, res, next) {
+export async function verifyToken(req, res, next) {
   const authHeader = req.headers.authorization;
 
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
@@ -18,9 +14,17 @@ export function verifyToken(req, res, next) {
 
   try {
     const decoded = jwt.verify(token, JWT_SECRET);
-    req.user = decoded;
+
+    const user = await User.findById(decoded.id);
+
+    if (!user) {
+      return res.status(401).json({ message: "Invalid token user." });
+    }
+
+    req.user = user;
     next();
   } catch (err) {
+    console.error("verifyToken error:", err);
     return res.status(403).json({ message: "Invalid or expired token." });
   }
 }

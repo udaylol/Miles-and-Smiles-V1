@@ -2,7 +2,7 @@ import { useState } from "react";
 import axiosClient from "../axiosClient";
 import { useAuth } from "../context/AuthContext";
 
-export default function ProfilePictureUploader() {
+export default function ProfilePictureEditor() {
   const { user, updateUser } = useAuth();
 
   const [preview, setPreview] = useState(null);
@@ -38,7 +38,6 @@ export default function ProfilePictureUploader() {
       updateUser({ pfp_url: newUrl });
       setPreview(null);
       setFile(null);
-
     } catch (err) {
       console.log(err);
       alert("Upload failed");
@@ -48,32 +47,39 @@ export default function ProfilePictureUploader() {
   };
 
   return (
-    <div className="flex items-start gap-4">
-
-      {/* Current or preview */}
+    <div className="flex flex-col items-center gap-3">
       <img
         src={preview || user?.pfp_url}
         className="w-28 h-28 rounded-xl object-cover border border-gray-800 shadow"
       />
 
-      <div className="space-y-3">
-        <label className="cursor-pointer text-sm bg-gray-800 px-3 py-1.5 rounded-md hover:bg-gray-700">
-          Change
-          <input type="file" className="hidden" accept="image/*" onChange={handleFile} />
-        </label>
+      <label
+        htmlFor="pfpInput"
+        className="cursor-pointer text-sm bg-gray-800 px-3 py-1.5 rounded-md hover:bg-gray-700"
+      >
+        Change
+      </label>
 
-        {file && (
-          <button
-            disabled={loading}
-            onClick={handleUpload}
-            className={`block bg-blue-600 px-3 py-1.5 rounded-md text-sm hover:bg-blue-700 ${
-              loading && "opacity-50 cursor-not-allowed"
-            }`}
-          >
-            {loading ? "Uploading..." : "Upload"}
-          </button>
-        )}
-      </div>
+      <input
+        id="pfpInput"
+        name="profilePicture"
+        type="file"
+        className="hidden"
+        accept="image/*"
+        onChange={handleFile}
+      />
+
+      {file && (
+        <button
+          disabled={loading}
+          onClick={handleUpload}
+          className={`bg-blue-600 px-3 py-1.5 rounded-md text-sm hover:bg-blue-700 ${
+            loading && "opacity-50 cursor-not-allowed"
+          }`}
+        >
+          {loading ? "Uploading..." : "Upload"}
+        </button>
+      )}
     </div>
   );
 }

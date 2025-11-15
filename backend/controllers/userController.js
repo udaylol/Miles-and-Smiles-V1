@@ -85,37 +85,45 @@ export async function updateProfilePicture(req, res) {
   }
 }
 
-export async function updateUsername(req, res) {
+export async function updateField(req, res) {
   try {
     const userId = req.user.id;
-    const { username } = req.body;
+    const updates = req.body;
 
-    if (!username) {
-      return res.status(400).json({ message: "Username is required." });
+    if (!updates || Object.keys(updates).length === 0) {
+      return res.status(400).json({ message: "No fields provided." });
     }
 
-    const existingUser = await User.findOne({ username });
-    if (existingUser && existingUser._id.toString() !== userId) {
-      return res.status(400).json({ message: "Username already taken." });
+    // Prevent updating restricted fields
+    const disallowed = ["_id", "password", "emailVerified"];
+    for (let key of Object.keys(updates)) {
+      if (disallowed.includes(key)) {
+        return res.status(400).json({ message: `Cannot update ${key}.` });
+      }
     }
 
-    const user = await User.findByIdAndUpdate(
-      userId,
-      { username },
-      { new: true }
-    );
+    // Special case: check if username already exists
+    if (updates.username) {
+      if (updates.username === req.user.username) {
+        return res.status(200).json({ message: "", user: req.user });
+      }
 
-    if (!user) {
-      return res.status(404).json({ message: "User not found." });
+      const existingUser = await User.findOne({ username: updates.username });
+      if (existingUser && existingUser._id.toString() !== userId) {
+        return res.status(400).json({ message: "Username already taken." });
+      }
     }
+
+    // Perform update
+    const user = await User.findByIdAndUpdate(userId, updates, { new: true });
 
     return res.status(200).json({
-      message: "Username updated successfully",
+      message: "Updated successfully",
       user,
     });
   } catch (err) {
-    console.error("updateUsername error:", err);
-    return res.status(500).json({ message: "Failed to update username" });
+    console.error("updateField error:", err);
+    return res.status(500).json({ message: "Failed to update user" });
   }
 }
 
