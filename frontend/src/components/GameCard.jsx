@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Star } from "lucide-react";
+import { Star , Heart } from "lucide-react";
 import axiosClient from "../axiosClient.js";
 import { useAuth } from "../context/AuthContext.jsx";
 
@@ -93,7 +93,7 @@ const GameCard = ({ image, title }) => {
             className="p-1 hover:bg-[--card] rounded transition-colors duration-200 flex-shrink-0 cursor-pointer"
             title={isFavorited ? "Remove from favorites" : "Add to favorites"}
           >
-            <Star
+            <Heart
               className={`${
                 isFavorited
                   ? "fill-yellow-400 text-yellow-400"

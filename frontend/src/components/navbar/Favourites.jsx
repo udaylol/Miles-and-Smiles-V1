@@ -1,4 +1,4 @@
-import { Heart } from "lucide-react";
+import { Heart, Star } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { useAuth } from "../../context/AuthContext.jsx";
@@ -41,9 +41,9 @@ export default function Favourites({ mobileVisible = false }) {
           showFavoritesOnly ? "Show all games" : "Show favorite games only"
         }
       >
-        <Heart
+        <Star
           className={`${
-            showFavoritesOnly ? "fill-red-500 text-red-500" : "text-(--muted)"
+            showFavoritesOnly ? "fill-yellow text-red-500" : "text-(--muted)"
           } transition-colors duration-200`}
           size={mobileVisible ? 18 : 20}
         />

@@ -4,7 +4,7 @@
   :root {
     /* ⭐ Improved Light Theme */
     --bg: #f5f2eb;                 /* slightly brighter base */
-    --surface: rgba((197,170,106))  /* navbar glass */
+    --surface: rgba(255, 255, 255, 0.65);  /* navbar glass */
     --card: rgba(255, 255, 255, 0.78);     /* card glass */
     --text: #2f2922;               /* stronger readable text */
     --muted: #7a6c5c;
@@ -69,5 +69,3 @@
     transition: background-color 0.25s ease, color 0.25s ease;
   }
 }
-
-
