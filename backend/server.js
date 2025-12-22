@@ -1,9 +1,9 @@
 import "dotenv/config.js";
 import http from "http";
-import app from "./app.js";
-import { connectDB, disconnectDB } from "./config/db.js";
-import { connectRedis, disconnectRedis } from "./config/redis.js"; // Add this
-import setupSocket from "./socket/socket.js";
+import app from "./src/app.js";
+import { connectDB, disconnectDB } from "./src/config/db.js";
+import { connectRedis, disconnectRedis } from "./src/config/redis.js"; // Add this
+import setupSocket from "./src/socket/socket.js";
 
 const PORT = process.env.BACKEND_SERVER_PORT || 3000;
 const IP_ADDRESS = process.env.BACKEND_SERVER_IP_ADDRESS || "localhost";

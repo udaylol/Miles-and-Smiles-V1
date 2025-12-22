@@ -8,6 +8,19 @@ export default defineConfig({
     allowedHosts: [".ngrok-free.app", ".ngrok-free.dev"], // allow ngrok URLs
     proxy: {
       "/api": "http://localhost:3000", // optional: forward API requests to backend
+      "/socket.io": {
+        target: "http://localhost:3000",
+        ws: true,
+      },
     },
   },
+  build: {
+    outDir: "dist",
+  },
+  test: {
+    environment: "jsdom",
+    globals: true,
+    setupFiles: "./src/test/setupTests.js",
+  },
 });
+
