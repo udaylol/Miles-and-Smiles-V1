@@ -32,28 +32,38 @@ export default function SignUp({ onMessage }) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col">
-      <input
-        type="text"
-        name="username"
-        placeholder="Username"
-        value={userData.username}
-        onChange={handleChange}
-        className="w-full mb-3 p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
-      />
-      <input
-        type="password"
-        name="password"
-        placeholder="Password"
-        value={userData.password}
-        onChange={handleChange}
-        className="w-full mb-4 p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
-      />
+    <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+      <div className="group">
+        <label className="block text-sm font-medium text-text-secondary mb-2 group-focus-within:text-accent transition-colors">
+          Username
+        </label>
+        <input
+          type="text"
+          name="username"
+          placeholder="Choose a username"
+          value={userData.username}
+          onChange={handleChange}
+          className="input"
+        />
+      </div>
+      <div className="group">
+        <label className="block text-sm font-medium text-text-secondary mb-2 group-focus-within:text-accent transition-colors">
+          Password
+        </label>
+        <input
+          type="password"
+          name="password"
+          placeholder="Create a password"
+          value={userData.password}
+          onChange={handleChange}
+          className="input"
+        />
+      </div>
       <button
         type="submit"
-        className="w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600 transition"
+        className="btn-primary w-full mt-3"
       >
-        Sign Up
+        Create Account
       </button>
     </form>
   );

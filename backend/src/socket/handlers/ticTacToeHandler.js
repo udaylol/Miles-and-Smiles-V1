@@ -4,6 +4,7 @@
  */
 
 import { TicTacToeGame } from "../game/ticTacToeGame.js";
+import { recordGameResult } from "../../controllers/userController.js";
 
 /**
  * Set up TicTacToe game event handlers
@@ -52,10 +53,22 @@ export function setupTicTacToeHandler(socket, io, games, rooms, connectedUsers) 
 
       console.log(`🔄 Game reset in room ${roomId}`);
 
-      // Emit game start event to all players in the room
+      // Build player info with usernames after reset (symbols may have swapped)
       const gameState = game.getState();
+      const playerInfo = {};
+      
+      for (const [symbol, socketId] of Object.entries(gameState.players)) {
+        const player = room.players.find(p => p.socketId === socketId);
+        playerInfo[symbol] = {
+          socketId,
+          username: player?.username || `Player ${symbol}`
+        };
+      }
+
+      // Emit game start event to all players in the room
       io.to(roomId).emit("game:start", {
         players: gameState.players,
+        playerInfo,
         board: gameState.board,
         turn: gameState.turn,
       });
@@ -129,6 +142,35 @@ export function setupTicTacToeHandler(socket, io, games, rooms, connectedUsers) 
       if (result.winner && result.winner !== "draw") {
         console.log(`🏆 Game over in room ${roomId}: ${result.winner} wins!`);
 
+        // Record game results for both players
+        const room = rooms.get(roomId);
+        if (room && room.players) {
+          const winnerSymbol = result.winner;
+          const winnerPlayer = room.players.find(p => game.players[winnerSymbol] === p.socketId);
+          const loserPlayer = room.players.find(p => game.players[winnerSymbol] !== p.socketId);
+          
+          if (winnerPlayer?.id) {
+            recordGameResult(winnerPlayer.id, {
+              gameName: "Tic Tac Toe",
+              result: "win",
+              myScore: 1,
+              opponentScore: 0,
+              opponent: loserPlayer?.username || "Unknown",
+              opponentId: loserPlayer?.id || null,
+            });
+          }
+          if (loserPlayer?.id) {
+            recordGameResult(loserPlayer.id, {
+              gameName: "Tic Tac Toe",
+              result: "loss",
+              myScore: 0,
+              opponentScore: 1,
+              opponent: winnerPlayer?.username || "Unknown",
+              opponentId: winnerPlayer?.id || null,
+            });
+          }
+        }
+
         // Emit game over event
         const gameState = game.getState();
         io.to(roomId).emit("game:over", {
@@ -141,6 +183,24 @@ export function setupTicTacToeHandler(socket, io, games, rooms, connectedUsers) 
       // Handle draw
       if (result.isDraw) {
         console.log(`🤝 Game draw in room ${roomId}`);
+
+        // Record draw for both players
+        const room = rooms.get(roomId);
+        if (room && room.players) {
+          for (const player of room.players) {
+            const opponent = room.players.find(p => p.id !== player.id);
+            if (player.id) {
+              recordGameResult(player.id, {
+                gameName: "Tic Tac Toe",
+                result: "draw",
+                myScore: 0,
+                opponentScore: 0,
+                opponent: opponent?.username || "Unknown",
+                opponentId: opponent?.id || null,
+              });
+            }
+          }
+        }
 
         // Emit game draw event
         const gameState = game.getState();
@@ -182,10 +242,26 @@ export function startTicTacToeGame(io, roomId, room, games) {
 
   console.log(`🎮 Game started in room ${roomId}`);
 
-  // Emit game start event to all players in the room
+  // Build player info with usernames
   const gameState = game.getState();
+  const playerInfo = {};
+  
+  // Map socket IDs to usernames - gameState.players maps symbol to socketId
+  for (const [symbol, socketId] of Object.entries(gameState.players)) {
+    // Find player by socketId (not by id/userId)
+    const player = room.players.find(p => p.socketId === socketId);
+    playerInfo[symbol] = {
+      socketId,
+      username: player?.username || `Player ${symbol}`
+    };
+  }
+
+  console.log(`📋 Player info for room ${roomId}:`, playerInfo);
+
+  // Emit game start event to all players in the room
   io.to(roomId).emit("game:start", {
     players: gameState.players,
+    playerInfo,
     board: gameState.board,
     turn: gameState.turn,
   });
@@ -196,8 +272,10 @@ export function startTicTacToeGame(io, roomId, room, games) {
  * @param {Socket} socket - Socket.IO socket instance
  * @param {string} roomId - Room ID
  * @param {Map} games - Games map
+ * @param {Map} rooms - Rooms map
+ * @param {Server} io - Socket.IO server instance
  */
-export function handleTicTacToePlayerLeave(socket, roomId, games) {
+export function handleTicTacToePlayerLeave(socket, roomId, games, rooms, io) {
   const game = games.get(roomId);
   if (game && game.winner === null) {
     // Player left during an active game
@@ -206,10 +284,46 @@ export function handleTicTacToePlayerLeave(socket, roomId, games) {
     if (playerSymbol) {
       console.log(`⚠️ Player left during active game in room ${roomId}`);
 
-      // Emit opponent left event to remaining players
-      socket.to(roomId).emit("game:opponent_left", {
-        message: "Your opponent has left the game",
-      });
+      // Find the remaining player (winner)
+      const room = rooms?.get(roomId);
+      const leavingPlayer = room?.players?.find(p => p.socketId === socket.id);
+      const remainingPlayer = room?.players?.find(p => p.socketId !== socket.id);
+      
+      // Record game results - winner gets a win, leaver gets a loss
+      if (leavingPlayer?.id) {
+        recordGameResult(leavingPlayer.id, {
+          gameName: "Tic Tac Toe",
+          result: "loss",
+          myScore: 0,
+          opponentScore: 1,
+          opponent: remainingPlayer?.username || "Unknown",
+          opponentId: remainingPlayer?.id || null,
+        });
+      }
+      
+      if (remainingPlayer?.id) {
+        recordGameResult(remainingPlayer.id, {
+          gameName: "Tic Tac Toe",
+          result: "win",
+          myScore: 1,
+          opponentScore: 0,
+          opponent: leavingPlayer?.username || "Unknown",
+          opponentId: leavingPlayer?.id || null,
+        });
+      }
+
+      // Emit opponent left event with winner info to remaining players
+      if (io && remainingPlayer) {
+        io.to(roomId).emit("game:opponent_left", {
+          message: "Your opponent has left the game. You win!",
+          winner: remainingPlayer.username,
+          winnerId: remainingPlayer.id,
+        });
+      } else {
+        socket.to(roomId).emit("game:opponent_left", {
+          message: "Your opponent has left the game. You win!",
+        });
+      }
 
       // Clean up the game
       games.delete(roomId);

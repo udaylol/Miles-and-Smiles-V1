@@ -28,27 +28,29 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="bg-(--surface) text-(--text) flex items-center justify-between px-4 md:px-6 py-3 shadow-md transition-colors duration-200 relative">
-      <Logo username={user?.username} isLoggedIn={isAuthenticated} />
+    <nav className="sticky top-0 z-50 bg-surface/80 backdrop-blur-xl border-b border-border">
+      <div className="max-w-7xl mx-auto px-4 md:px-6 py-3 flex items-center justify-between">
+        <Logo username={user?.username} isLoggedIn={isAuthenticated} />
 
-      <SearchBar onChange={(value) => setQuery(value)} />
+        <SearchBar onChange={(value) => setQuery(value)} />
 
-      <div className="flex items-center space-x-3 md:space-x-4">
-        <Friends />
-        <Favourites isLoggedIn={isAuthenticated} />
-        <ThemeToggle />
-        {isAuthenticated && <Profile user={user} />}
-        <AuthButtons
-          isLoggedIn={isAuthenticated}
-          handleLogout={handleLogout}
-          handleLogin={handleLogin}
-        />
-        <button
-          onClick={toggleMenu}
-          className="md:hidden p-2 hover:bg-(--card) rounded-full cursor-pointer"
-        >
-          {menuOpen ? <X size={22} /> : <Menu size={22} />}
-        </button>
+        <div className="flex items-center gap-2 md:gap-3">
+          <Friends />
+          <Favourites isLoggedIn={isAuthenticated} />
+          <ThemeToggle />
+          {isAuthenticated && <Profile user={user} />}
+          <AuthButtons
+            isLoggedIn={isAuthenticated}
+            handleLogout={handleLogout}
+            handleLogin={handleLogin}
+          />
+          <button
+            onClick={toggleMenu}
+            className="md:hidden p-2.5 hover:bg-accent-soft text-text-secondary hover:text-accent rounded-xl transition-colors"
+          >
+            {menuOpen ? <X size={20} /> : <Menu size={20} />}
+          </button>
+        </div>
       </div>
 
       <MobileMenu

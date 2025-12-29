@@ -1,7 +1,9 @@
 /**
  * Cell Component
- * Individual square in the TicTacToe board
+ * Individual square in the TicTacToe board with modern styling
  */
+
+import { memo } from "react";
 
 /**
  * @param {Object} props
@@ -9,35 +11,44 @@
  * @param {number} props.index - Cell index (0-8)
  * @param {boolean} props.isClickable - Whether the cell can be clicked
  * @param {Function} props.onClick - Click handler function
+ * @param {boolean} props.isWinningCell - Whether this cell is part of winning line
  */
-function Cell({ value, index, isClickable, onClick }) {
+function Cell({ value, index, isClickable, onClick, isWinningCell }) {
   return (
     <button
       onClick={() => onClick(index)}
       disabled={!isClickable}
       className={`
-        w-24 h-24 sm:w-32 sm:h-32
-        border-2 border-gray-300 dark:border-gray-600
+        w-20 h-20 sm:w-24 sm:h-24
+        rounded-xl
         text-4xl sm:text-5xl font-bold
         transition-all duration-200
-        ${
-          isClickable
-            ? "hover:bg-blue-100 dark:hover:bg-blue-900 cursor-pointer active:scale-95"
-            : "cursor-not-allowed opacity-60"
+        flex items-center justify-center
+        touch-manipulation
+        ${isClickable
+          ? "bg-slate-100/80 dark:bg-slate-700/50 hover:bg-slate-200 dark:hover:bg-slate-600 cursor-pointer active:scale-95 hover:shadow-lg"
+          : "cursor-not-allowed"
         }
-        ${
-          value === "X"
-            ? "text-blue-600 dark:text-blue-400"
-            : value === "O"
-            ? "text-red-600 dark:text-red-400"
-            : "text-gray-400"
+        ${!value && !isClickable ? "bg-slate-100/40 dark:bg-slate-800/30" : ""}
+        ${!value && isClickable ? "bg-slate-100/80 dark:bg-slate-700/50" : ""}
+        ${value === "X"
+          ? `bg-blue-500/20 dark:bg-blue-500/30 ${isWinningCell ? "ring-2 ring-blue-500 shadow-[0_0_20px_rgba(59,130,246,0.5)]" : ""}`
+          : ""
         }
-        ${!value && isClickable ? "bg-green-50 dark:bg-green-900/20" : ""}
+        ${value === "O"
+          ? `bg-rose-500/20 dark:bg-rose-500/30 ${isWinningCell ? "ring-2 ring-rose-500 shadow-[0_0_20px_rgba(244,63,94,0.5)]" : ""}`
+          : ""
+        }
       `}
     >
-      {value || ""}
+      {value === "X" && (
+        <span className="text-blue-500 drop-shadow-sm">✕</span>
+      )}
+      {value === "O" && (
+        <span className="text-rose-500 drop-shadow-sm">○</span>
+      )}
     </button>
   );
 }
 
-export default Cell;
+export default memo(Cell);

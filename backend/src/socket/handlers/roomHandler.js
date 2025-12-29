@@ -152,9 +152,9 @@ export function setupRoomHandler(socket, io, rooms, onGameStart, onPlayerLeave, 
         players: room.players,
       });
 
-      // If this is the second player joining and it's Tic Tac Toe, start the game
+      // If this is the second player joining, start the game
       // Use a small delay to ensure all event listeners are set up on the client
-      if (room.players.length === 2 && gameName === "Tic Tac Toe") {
+      if (room.players.length === 2) {
         setTimeout(() => {
           onGameStart(roomId, room);
         }, 100); // Small delay to ensure client listeners are ready

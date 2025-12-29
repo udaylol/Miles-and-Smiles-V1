@@ -33,17 +33,19 @@ export default function Favourites({ mobileVisible = false }) {
   const visibility = mobileVisible ? "flex md:hidden" : "hidden md:flex";
 
   return (
-    <div className={`${visibility} items-center space-x-4`}>
+    <div className={`${visibility} items-center`}>
       <button
         onClick={handleFavoritesToggle}
-        className="p-2 hover:bg-(--card) rounded-full cursor-pointer"
+        className="p-2.5 rounded-xl hover:bg-accent-soft transition-all duration-200 active:scale-95"
         title={
           showFavoritesOnly ? "Show all games" : "Show favorite games only"
         }
       >
         <Heart
           className={`${
-            showFavoritesOnly ? "fill-red-500 text-red-500" : "text-(--muted)"
+            showFavoritesOnly 
+              ? "fill-accent text-accent" 
+              : "text-text-muted hover:text-accent"
           } transition-colors duration-200`}
           size={mobileVisible ? 18 : 20}
         />

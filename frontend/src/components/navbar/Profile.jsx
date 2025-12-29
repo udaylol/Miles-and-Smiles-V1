@@ -9,21 +9,21 @@ export default function Profile({ user, mobileVisible = false }) {
   const textVisible = mobileVisible ? "flex" : "hidden lg:flex";
 
   return (
-    <div
+    <button
       onClick={() => navigate("/profile")}
-      className={`${visibility} items-center space-x-2 cursor-pointer`}
+      className={`${visibility} items-center gap-2 p-1.5 pr-3 rounded-xl hover:bg-bg-deep transition-all duration-200 active:scale-[0.98]`}
       title={user.username || "Guest"}
     >
       <img
         src={user.pfp_url || "/guestpfp.png"}
         alt={user.username || "profile"}
-        className={`${imageSize} rounded-full`}
+        className={`${imageSize} rounded-full ring-2 ring-border`}
       />
       <div className={`${textVisible} flex-col text-left`}>
-        <span className="font-medium text-sm text-[--text]">
+        <span className="font-medium text-sm text-text">
           {user.username}
         </span>
       </div>
-    </div>
+    </button>
   );
 }

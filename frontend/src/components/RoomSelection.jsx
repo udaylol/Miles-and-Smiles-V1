@@ -182,48 +182,66 @@ const RoomSelection = ({ gameName, onRoomJoined }) => {
 
   if (mode === null) {
     return (
-      <>
-        {/* <Navbar /> */}
-        <div className="min-h-screen bg-[--bg] text-[--text] flex items-center justify-center p-4">
-          <div className="bg-[--card] rounded-xl shadow-lg p-8 max-w-md w-full border border-gray-200">
-            <h1 className="text-3xl font-bold text-center mb-2">{gameName}</h1>
-            <p className="text-center text-gray-600 mb-8">
-              Choose an option to start playing
-            </p>
+      <div className="min-h-screen bg-bg font-body grain flex items-center justify-center p-6">
+        {/* Background elements */}
+        <div className="fixed inset-0 geo-pattern pointer-events-none opacity-60" />
+        <div className="fixed top-20 left-[20%] w-40 h-40 rounded-full bg-accent/10 blur-3xl animate-float" />
+        <div className="fixed bottom-20 right-[20%] w-48 h-48 rounded-full bg-violet/10 blur-3xl animate-float" style={{ animationDelay: '-2s' }} />
+        
+        <div className="relative card p-8 max-w-md w-full animate-hero">
+          {/* Game icon */}
+          <div className="w-16 h-16 rounded-2xl bg-accent-soft flex items-center justify-center mx-auto mb-6">
+            <span className="text-3xl">🎮</span>
+          </div>
+          
+          <h1 className="font-display text-3xl font-semibold text-center text-text mb-2">{gameName}</h1>
+          <p className="text-center text-text-secondary mb-8">
+            Choose how you want to play
+          </p>
 
-            <div className="space-y-4">
-              <button
-                onClick={() => setMode("create")}
-                className="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200"
-              >
-                Create Room
-              </button>
+          <div className="space-y-3">
+            <button
+              onClick={() => setMode("create")}
+              className="btn-primary w-full flex items-center justify-center gap-2"
+            >
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+              </svg>
+              Create Room
+            </button>
 
-              <button
-                onClick={() => setMode("join")}
-                className="w-full bg-green-500 hover:bg-green-600 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200"
-              >
-                Join Room
-              </button>
+            <button
+              onClick={() => setMode("join")}
+              className="btn-secondary w-full flex items-center justify-center gap-2"
+            >
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14" />
+              </svg>
+              Join Room
+            </button>
 
-              <button
-                onClick={handleBack}
-                className="w-full bg-gray-500 hover:bg-gray-600 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200"
-              >
-                Back to Home
-              </button>
-            </div>
+            <button
+              onClick={handleBack}
+              className="btn-ghost w-full"
+            >
+              Back to Home
+            </button>
           </div>
         </div>
-      </>
+      </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[--bg] text-[--text] flex items-center justify-center p-4">
-      <div className="bg-[--card] rounded-xl shadow-lg p-8 max-w-md w-full border border-gray-200">
-        <h1 className="text-3xl font-bold text-center mb-2">{gameName}</h1>
-        <p className="text-center text-gray-600 mb-8">
+    <div className="min-h-screen bg-bg font-body grain flex items-center justify-center p-6">
+      {/* Background elements */}
+      <div className="fixed inset-0 geo-pattern pointer-events-none opacity-60" />
+      <div className="fixed top-20 left-[20%] w-40 h-40 rounded-full bg-accent/10 blur-3xl animate-float" />
+      <div className="fixed bottom-20 right-[20%] w-48 h-48 rounded-full bg-violet/10 blur-3xl animate-float" style={{ animationDelay: '-2s' }} />
+      
+      <div className="relative card p-8 max-w-md w-full animate-hero">
+        <h1 className="font-display text-3xl font-semibold text-center text-text mb-2">{gameName}</h1>
+        <p className="text-center text-text-secondary mb-8">
           {mode === "create" ? "Create a new room" : "Join an existing room"}
         </p>
 
@@ -231,25 +249,31 @@ const RoomSelection = ({ gameName, onRoomJoined }) => {
           <div className="space-y-4">
             {createdRoomCode ? (
               <>
-                <div className="p-4 bg-green-50 border border-green-200 rounded-lg text-center">
-                  <p className="text-sm text-gray-600 mb-2">Room created!</p>
-                  <p className="text-2xl font-bold text-green-700 font-mono">
+                <div className="p-6 bg-emerald-soft border border-emerald/20 rounded-2xl text-center">
+                  <div className="w-12 h-12 rounded-full bg-emerald/20 flex items-center justify-center mx-auto mb-3">
+                    <svg className="w-6 h-6 text-emerald" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                  </div>
+                  <p className="text-sm text-text-secondary mb-2">Room created!</p>
+                  <p className="font-display text-3xl font-bold text-emerald tracking-wider">
                     {createdRoomCode}
                   </p>
-                  <p className="text-xs text-gray-500 mt-2">
+                  <p className="text-xs text-text-muted mt-3">
                     Share this code with your friend
                   </p>
                 </div>
-                <p className="text-sm text-center text-gray-600">
-                  Loading game...
-                </p>
+                <div className="flex items-center justify-center gap-2 text-sm text-text-secondary">
+                  <div className="w-4 h-4 border-2 border-accent border-t-transparent rounded-full animate-spin" />
+                  Waiting for opponent...
+                </div>
               </>
             ) : (
               <>
                 <button
                   onClick={handleCreateRoom}
                   disabled={loading || !socket?.connected}
-                  className="w-full bg-blue-500 hover:bg-blue-600 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200"
+                  className="btn-primary w-full disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {loading
                     ? "Creating Room..."
@@ -264,7 +288,7 @@ const RoomSelection = ({ gameName, onRoomJoined }) => {
                     setError("");
                     setCreatedRoomCode(null);
                   }}
-                  className="w-full bg-gray-500 hover:bg-gray-600 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200"
+                  className="btn-ghost w-full"
                 >
                   Back
                 </button>
@@ -273,20 +297,25 @@ const RoomSelection = ({ gameName, onRoomJoined }) => {
           </div>
         ) : (
           <div className="space-y-4">
-            <input
-              type="text"
-              value={roomCode}
-              onChange={(e) => setRoomCode(e.target.value.toUpperCase())}
-              placeholder="Enter room code"
-              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-center text-lg font-mono"
-              maxLength={6}
-              disabled={loading}
-            />
+            <div>
+              <label className="block text-sm font-medium text-text-secondary mb-2">
+                Room Code
+              </label>
+              <input
+                type="text"
+                value={roomCode}
+                onChange={(e) => setRoomCode(e.target.value.toUpperCase())}
+                placeholder="XXXXXX"
+                className="input text-center font-display text-2xl tracking-[0.3em] uppercase"
+                maxLength={6}
+                disabled={loading}
+              />
+            </div>
 
             <button
               onClick={handleJoinRoom}
               disabled={loading || !socket?.connected || !roomCode.trim()}
-              className="w-full bg-green-500 hover:bg-green-600 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200"
+              className="btn-primary w-full disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading
                 ? "Joining Room..."
@@ -301,7 +330,7 @@ const RoomSelection = ({ gameName, onRoomJoined }) => {
                 setRoomCode("");
                 setError("");
               }}
-              className="w-full bg-gray-500 hover:bg-gray-600 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200"
+              className="btn-ghost w-full"
             >
               Back
             </button>
@@ -309,7 +338,7 @@ const RoomSelection = ({ gameName, onRoomJoined }) => {
         )}
 
         {error && (
-          <div className="mt-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg text-center">
+          <div className="mt-4 p-4 bg-accent-soft border border-accent/20 text-accent rounded-xl text-center text-sm animate-fadeIn">
             {error}
           </div>
         )}

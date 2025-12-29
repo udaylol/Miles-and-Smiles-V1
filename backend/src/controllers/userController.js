@@ -417,3 +417,158 @@ export const getMe = async (req, res) => {
   }
 };
 
+/**
+ * Get user game statistics
+ */
+export const getGameStats = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id).lean();
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    // Calculate win percentage
+    const winPercentage = user.totalGamesPlayed > 0 
+      ? Math.round((user.totalWins / user.totalGamesPlayed) * 100) 
+      : 0;
+
+    res.json({
+      totalGamesPlayed: user.totalGamesPlayed || 0,
+      totalWins: user.totalWins || 0,
+      totalLosses: user.totalLosses || 0,
+      totalDraws: user.totalDraws || 0,
+      winPercentage,
+      currentStreak: user.currentStreak || 0,
+      longestStreak: user.longestStreak || 0,
+      lastGamePlayed: user.lastGamePlayed,
+      gameStats: user.gameStats || [],
+      matchHistory: (user.matchHistory || []).slice(0, 20), // Return last 20 matches
+    });
+  } catch (err) {
+    console.error("getGameStats error:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+/**
+ * Get match history for a specific game
+ */
+export const getGameHistory = async (req, res) => {
+  try {
+    const { gameName } = req.params;
+    const user = await User.findById(req.user.id).lean();
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    // Filter match history by game name
+    const gameHistory = (user.matchHistory || [])
+      .filter(match => match.gameName === gameName)
+      .slice(0, 20);
+
+    // Get game-specific stats
+    const gameStats = (user.gameStats || []).find(g => g.gameName === gameName) || {
+      gameName,
+      gamesPlayed: 0,
+      wins: 0,
+      losses: 0,
+      draws: 0,
+      highestScore: 0,
+      totalScore: 0,
+    };
+
+    // Calculate win percentage for this game
+    const winPercentage = gameStats.gamesPlayed > 0 
+      ? Math.round((gameStats.wins / gameStats.gamesPlayed) * 100) 
+      : 0;
+
+    res.json({
+      gameName,
+      stats: {
+        ...gameStats,
+        winPercentage,
+      },
+      history: gameHistory,
+    });
+  } catch (err) {
+    console.error("getGameHistory error:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+/**
+ * Record a game result
+ * Called internally by game handlers when a game ends
+ */
+export const recordGameResult = async (userId, gameData) => {
+  try {
+    const user = await User.findById(userId);
+    if (!user) return null;
+
+    const { gameName, result, myScore, opponentScore, opponent, opponentId } = gameData;
+
+    // Update overall stats
+    user.totalGamesPlayed = (user.totalGamesPlayed || 0) + 1;
+    user.lastGamePlayed = new Date();
+
+    if (result === "win") {
+      user.totalWins = (user.totalWins || 0) + 1;
+      user.currentStreak = (user.currentStreak || 0) + 1;
+      if (user.currentStreak > (user.longestStreak || 0)) {
+        user.longestStreak = user.currentStreak;
+      }
+    } else if (result === "loss") {
+      user.totalLosses = (user.totalLosses || 0) + 1;
+      user.currentStreak = 0;
+    } else {
+      user.totalDraws = (user.totalDraws || 0) + 1;
+    }
+
+    // Update per-game stats
+    let gameStatsIndex = user.gameStats.findIndex(g => g.gameName === gameName);
+    if (gameStatsIndex === -1) {
+      user.gameStats.push({
+        gameName,
+        gamesPlayed: 0,
+        wins: 0,
+        losses: 0,
+        draws: 0,
+        highestScore: 0,
+        totalScore: 0,
+        lastPlayed: null,
+      });
+      gameStatsIndex = user.gameStats.length - 1;
+    }
+
+    const gameStats = user.gameStats[gameStatsIndex];
+    gameStats.gamesPlayed += 1;
+    gameStats.lastPlayed = new Date();
+    
+    if (result === "win") gameStats.wins += 1;
+    else if (result === "loss") gameStats.losses += 1;
+    else gameStats.draws += 1;
+
+    if (myScore > gameStats.highestScore) {
+      gameStats.highestScore = myScore;
+    }
+    gameStats.totalScore += myScore;
+
+    // Add to match history (keep only last 50)
+    user.matchHistory.unshift({
+      gameName,
+      opponent: opponent || "Unknown",
+      opponentId: opponentId || null,
+      result,
+      myScore,
+      opponentScore,
+      playedAt: new Date(),
+    });
+
+    if (user.matchHistory.length > 50) {
+      user.matchHistory = user.matchHistory.slice(0, 50);
+    }
+
+    await user.save();
+    return user;
+  } catch (err) {
+    console.error("recordGameResult error:", err);
+    return null;
+  }
+};
+

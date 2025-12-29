@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { getFavorites, toggleFavorite } from "../controllers/userController.js";
+import { getFavorites, toggleFavorite, getGameStats, getGameHistory } from "../controllers/userController.js";
 import { verifyToken } from "../middlewares/authMiddleware.js";
 import upload from "../middlewares/uploadMiddleware.js";
 import {
@@ -20,6 +20,8 @@ router.get("/me", verifyToken, getMe);
 
 router.get("/king", getKing);
 router.get("/favorites", verifyToken, getFavorites);
+router.get("/stats", verifyToken, getGameStats);
+router.get("/history/:gameName", verifyToken, getGameHistory);
 
 router.post("/favorites", verifyToken, toggleFavorite);
 router.post("/friends", verifyToken, sendFriendRequest);

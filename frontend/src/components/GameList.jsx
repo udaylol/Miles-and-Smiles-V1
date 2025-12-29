@@ -11,23 +11,23 @@ const GameList = () => {
     () => localStorage.getItem("showFavoritesOnly") === "true"
   );
   const { isAuthenticated, token } = useAuth();
-  const { query } = useSearch(); // ✅ live search term from context
+  const { query } = useSearch();
 
-  // ✅ Fetch all games (from MongoDB)
+  // Fetch all games (from MongoDB)
   useEffect(() => {
     async function fetchGames() {
       try {
         const res = await axiosClient.get(`/api/games`);
         setAllGames(res.data);
       } catch (error) {
-        console.error("❌ Error fetching games:", error);
+        console.error("Error fetching games:", error);
       }
     }
 
     fetchGames();
   }, []);
 
-  // ✅ Fetch user favorites if logged in
+  // Fetch user favorites if logged in
   const fetchFavorites = useCallback(async () => {
     if (!isAuthenticated || !token) {
       setFavoriteGames([]);
@@ -50,7 +50,7 @@ const GameList = () => {
     fetchFavorites();
   }, [fetchFavorites]);
 
-  // ✅ Handle favorites toggling and sync across app
+  // Handle favorites toggling and sync across app
   useEffect(() => {
     const handleFavoritesFilterChange = async (e) => {
       setShowFavoritesOnly(e.detail);
@@ -80,7 +80,7 @@ const GameList = () => {
     };
   }, [isAuthenticated, fetchFavorites]);
 
-  // ✅ Compute final displayed games (favorites + search filtering)
+  // Compute final displayed games (favorites + search filtering)
   const displayedGames = useMemo(() => {
     let gamesToShow = allGames;
 
@@ -91,7 +91,7 @@ const GameList = () => {
       );
     }
 
-    // 🔥 Real-time search filter (case-insensitive, startsWith)
+    // Real-time search filter (case-insensitive, startsWith)
     if (query.trim()) {
       const lower = query.toLowerCase();
       gamesToShow = gamesToShow.filter(
@@ -101,32 +101,61 @@ const GameList = () => {
 
     return gamesToShow;
   }, [allGames, favoriteGames, showFavoritesOnly, isAuthenticated, query]);
-  // ✅ Render
+
+  // Render
   return (
-    <div className="w-full px-4 py-8 flex gap-6 flex-wrap justify-center">
-      {displayedGames.length > 0 ? (
-        displayedGames.map((game, i) => (
-          <GameCard key={game._id || i} image={game.image} title={game.title} />
-        ))
-      ) : showFavoritesOnly && query.trim() && isAuthenticated ? (
-        <div className="w-full text-center py-12">
-          <p className="text-[--muted] text-lg">
-            No favorite games match your search.
+    <div className="w-full">
+      {/* Games Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 justify-items-center">
+        {displayedGames.length > 0 &&
+          displayedGames.map((game, i) => (
+            <GameCard key={game._id || i} image={game.image} title={game.title} />
+          ))
+        }
+      </div>
+      
+      {/* Empty States */}
+      {displayedGames.length === 0 && showFavoritesOnly && query.trim() && isAuthenticated && (
+        <div className="text-center py-16">
+          <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center">
+            <span className="text-4xl">🔍</span>
+          </div>
+          <h3 className="text-lg font-semibold text-slate-700 dark:text-slate-300 mb-2">
+            No matching favorites
+          </h3>
+          <p className="text-slate-500 dark:text-slate-400">
+            No favorite games match "{query}". Try a different search.
           </p>
         </div>
-      ) : showFavoritesOnly && isAuthenticated ? (
-        <div className="w-full text-center py-12">
-          <p className="text-[--muted] text-lg">
-            No favorite games yet. Start adding some!
+      )}
+      
+      {displayedGames.length === 0 && showFavoritesOnly && !query.trim() && isAuthenticated && (
+        <div className="text-center py-16">
+          <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-violet-100 dark:bg-violet-900/30 flex items-center justify-center">
+            <span className="text-4xl">⭐</span>
+          </div>
+          <h3 className="text-lg font-semibold text-slate-700 dark:text-slate-300 mb-2">
+            No favorites yet
+          </h3>
+          <p className="text-slate-500 dark:text-slate-400">
+            Click the star on any game to add it to your favorites!
           </p>
         </div>
-      ) : query.trim() ? (
-        <div className="w-full text-center py-12">
-          <p className="text-[--muted] text-lg">
-            No games found starting with “{query}”.
+      )}
+      
+      {displayedGames.length === 0 && !showFavoritesOnly && query.trim() && (
+        <div className="text-center py-16">
+          <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
+            <span className="text-4xl">🎯</span>
+          </div>
+          <h3 className="text-lg font-semibold text-slate-700 dark:text-slate-300 mb-2">
+            No games found
+          </h3>
+          <p className="text-slate-500 dark:text-slate-400">
+            No games starting with "{query}". Try a different search.
           </p>
         </div>
-      ) : null}
+      )}
     </div>
   );
 };

@@ -27,6 +27,10 @@ export function useTicTacToeGame(socket, roomId) {
   const [opponentLeft, setOpponentLeft] = useState(false);
   const [error, setError] = useState("");
   const [isReconnecting, setIsReconnecting] = useState(false);
+  const [playerInfo, setPlayerInfo] = useState({
+    X: { username: "Player X" },
+    O: { username: "Player O" }
+  });
 
   // Determine if it's the current player's turn
   const isMyTurn =
@@ -66,6 +70,11 @@ export function useTicTacToeGame(socket, roomId) {
       setWinner(null);
       setOpponentLeft(false);
       setError("");
+
+      // Store player info with usernames
+      if (data.playerInfo) {
+        setPlayerInfo(data.playerInfo);
+      }
 
       // Determine which symbol this player is
       if (data.players.X === socket.id) {
@@ -266,6 +275,8 @@ export function useTicTacToeGame(socket, roomId) {
     opponentLeft,
     error,
     isMyTurn,
+    isReconnecting,
+    playerInfo,
     // Handlers
     handleCellClick,
     handlePlayAgain,

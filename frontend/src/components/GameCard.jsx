@@ -3,10 +3,12 @@ import { useNavigate } from "react-router-dom";
 import { Star } from "lucide-react";
 import axiosClient from "../axiosClient.js";
 import { useAuth } from "../context/AuthContext.jsx";
+import GameHistoryModal from "./GameHistoryModal.jsx";
 
 const GameCard = ({ image, title }) => {
   const navigate = useNavigate();
   const [isFavorited, setIsFavorited] = useState(false);
+  const [showHistoryModal, setShowHistoryModal] = useState(false);
   const { isAuthenticated, token, user, updateUser } = useAuth();
 
   // Fetch user's favorite games if logged in
@@ -34,8 +36,23 @@ const GameCard = ({ image, title }) => {
   }, [title, isAuthenticated, token]);
 
   const handleClick = () => {
+    // If authenticated, show history modal first
+    if (isAuthenticated) {
+      setShowHistoryModal(true);
+    } else {
+      // If not authenticated, go directly to game
+      navigateToGame();
+    }
+  };
+
+  const navigateToGame = () => {
     const path = "/games/" + title.toLowerCase().replace(/\s+/g, "-");
     navigate(path);
+  };
+
+  const handlePlayFromModal = () => {
+    setShowHistoryModal(false);
+    navigateToGame();
   };
 
   const handleStarClick = async (e) => {
@@ -73,37 +90,76 @@ const GameCard = ({ image, title }) => {
   return (
     <div
       onClick={handleClick}
-      className="w-60 bg-[--card] text-[--text] rounded-xl shadow-md overflow-hidden border border-gray-100 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 cursor-pointer"
+      className="group card cursor-pointer animate-stagger overflow-hidden"
     >
-      <div className="w-full h-40 overflow-hidden rounded-t-xl">
+      {/* Image Container */}
+      <div className="relative w-full aspect-[4/3] overflow-hidden bg-bg-deep">
         <img
           src={image}
           alt={title}
-          className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
+          className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
         />
+        {/* Gradient Overlay - accent tinted */}
+        <div className="absolute inset-0 bg-gradient-to-t from-[#1A1714]/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+        
+        {/* Play Button Overlay - bigger, bolder */}
+        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-500">
+          <div className="w-16 h-16 rounded-full bg-accent flex items-center justify-center shadow-lg shadow-accent/30 transform scale-75 group-hover:scale-100 transition-all duration-500 animate-glow">
+            <svg className="w-7 h-7 text-white ml-1" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M8 5v14l11-7z" />
+            </svg>
+          </div>
+        </div>
+        
+        {/* Favorite Badge (if favorited) */}
+        {isFavorited && (
+          <div className="absolute top-3 left-3 tag tag-amber shadow-lg">
+            <Star size={12} className="fill-current" />
+            Favorite
+          </div>
+        )}
       </div>
 
-      <div className="px-3 py-2 text-center bg-[--surface] transition-colors duration-300">
-        <div className="flex items-center justify-center gap-2">
-          <h2 className="text-base font-semibold text-[--text] truncate flex-1">
+      {/* Content */}
+      <div className="p-5">
+        <div className="flex items-center justify-between gap-3">
+          <h2 className="font-display text-xl font-semibold text-text truncate">
             {title}
           </h2>
           <button
             onClick={handleStarClick}
-            className="p-1 hover:bg-[--card] rounded transition-colors duration-200 flex-shrink-0 cursor-pointer"
+            className={`p-2.5 rounded-xl transition-all duration-200 flex-shrink-0 cursor-pointer ${
+              isFavorited 
+                ? "bg-amber-soft hover:bg-amber/20" 
+                : "bg-bg-deep hover:bg-accent-soft"
+            }`}
             title={isFavorited ? "Remove from favorites" : "Add to favorites"}
           >
             <Star
               className={`${
                 isFavorited
-                  ? "fill-yellow-400 text-yellow-400"
-                  : "text-[--muted]"
+                  ? "fill-amber text-amber"
+                  : "text-text-muted group-hover:text-accent"
               } transition-colors duration-200`}
               size={18}
             />
           </button>
         </div>
+        
+        {/* Play text */}
+        <p className="mt-3 text-sm text-text-secondary flex items-center gap-2">
+          <span className="w-2 h-2 rounded-full bg-emerald animate-pulse" />
+          Ready to play
+        </p>
       </div>
+
+      {/* Game History Modal */}
+      <GameHistoryModal
+        isOpen={showHistoryModal}
+        onClose={() => setShowHistoryModal(false)}
+        gameName={title}
+        onPlay={handlePlayFromModal}
+      />
     </div>
   );
 };

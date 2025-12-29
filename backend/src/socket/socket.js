@@ -14,6 +14,21 @@ import {
   startTicTacToeGame,
   handleTicTacToePlayerLeave,
 } from "./handlers/ticTacToeHandler.js";
+import {
+  setupDotsAndBoxesHandler,
+  startDotsAndBoxesGame,
+  handleDotsAndBoxesPlayerLeave,
+} from "./handlers/dotsAndBoxesHandler.js";
+import {
+  setupSnakesAndLaddersHandler,
+  startSnakesAndLaddersGame,
+  handleSnakesAndLaddersPlayerLeave,
+} from "./handlers/snakesAndLaddersHandler.js";
+import {
+  setupMemoryHandler,
+  startMemoryGame,
+  handleMemoryPlayerLeave,
+} from "./handlers/memoryHandler.js";
 import { setupNotificationHandler } from "./handlers/notificationHandler.js"; // NEW
 import authenticateSocket from "../middlewares/socketMiddleware.js";
 
@@ -75,12 +90,30 @@ export default function setupSocket(server) {
       io,
       rooms,
       (roomId, room) => {
-        // Callback when game should start
-        startTicTacToeGame(io, roomId, room, games);
+        // Callback when game should start - detect game type
+        if (room.gameName === "Dots and Boxes") {
+          startDotsAndBoxesGame(io, roomId, room, games);
+        } else if (room.gameName === "Snakes and Ladders") {
+          startSnakesAndLaddersGame(io, roomId, room, games);
+        } else if (room.gameName === "Memory") {
+          startMemoryGame(io, roomId, room, games);
+        } else {
+          // Default to TicTacToe for backward compatibility
+          startTicTacToeGame(io, roomId, room, games);
+        }
       },
       (socket, roomId) => {
         // Callback when player leaves room (intentional leave)
-        handleTicTacToePlayerLeave(socket, roomId, games);
+        const room = rooms.get(roomId);
+        if (room?.gameName === "Dots and Boxes") {
+          handleDotsAndBoxesPlayerLeave(socket, roomId, games, rooms, io);
+        } else if (room?.gameName === "Snakes and Ladders") {
+          handleSnakesAndLaddersPlayerLeave(socket, roomId, games, rooms, io);
+        } else if (room?.gameName === "Memory") {
+          handleMemoryPlayerLeave(socket, roomId, games, rooms, io);
+        } else {
+          handleTicTacToePlayerLeave(socket, roomId, games, rooms, io);
+        }
       },
       connectedUsers
     );
@@ -90,6 +123,15 @@ export default function setupSocket(server) {
 
     // Set up TicTacToe game handlers
     setupTicTacToeHandler(socket, io, games, rooms, connectedUsers);
+
+    // Set up Dots and Boxes game handlers
+    setupDotsAndBoxesHandler(socket, io, games, rooms, connectedUsers);
+
+    // Set up Snakes and Ladders game handlers
+    setupSnakesAndLaddersHandler(socket, io, games, rooms, connectedUsers);
+
+    // Set up Memory game handlers
+    setupMemoryHandler(socket, io, games, rooms, connectedUsers);
 
     // Set up notification handlers (NEW)
     setupNotificationHandler(socket, io);

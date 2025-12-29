@@ -112,15 +112,15 @@ const Chat = ({ socket, roomId }) => {
   }
 
   return (
-    <div className="fixed bottom-4 right-4 w-80 max-w-[calc(100vw-2rem)] bg-[--card] border border-gray-200 rounded-lg shadow-lg flex flex-col z-50">
+    <div className="fixed bottom-4 right-4 w-80 max-w-[calc(100vw-2rem)] card flex flex-col z-50">
       {/* Chat Header */}
       <div
-        className="flex items-center justify-between p-3 bg-[--surface] border-b border-gray-200 rounded-t-lg cursor-pointer"
+        className="flex items-center justify-between p-3 bg-surface border-b border-border rounded-t-2xl cursor-pointer"
         onClick={() => setIsOpen(!isOpen)}
       >
-        <h3 className="font-semibold text-[--text]">Chat</h3>
+        <h3 className="font-display font-semibold text-text">Chat</h3>
         <button
-          className="text-gray-500 hover:text-gray-700"
+          className="text-text-muted hover:text-text transition-colors"
           onClick={(e) => {
             e.stopPropagation();
             setIsOpen(!isOpen);
@@ -161,7 +161,7 @@ const Chat = ({ socket, roomId }) => {
       {/* Chat Messages */}
       {isOpen && (
         <>
-          <div className="flex-1 overflow-y-auto p-3 space-y-2 max-h-96 min-h-[200px]">
+          <div className="flex-1 overflow-y-auto p-3 space-y-2 max-h-96 min-h-[200px] bg-bg">
             {messages.map((msg) => {
               // Compare user IDs as strings to handle ObjectId vs string comparisons
               const msgUserId = msg.userId?.toString();
@@ -180,12 +180,12 @@ const Chat = ({ socket, roomId }) => {
                   }`}
                 >
                   <div
-                    className={`max-w-[80%] rounded-lg px-3 py-2 ${
+                    className={`max-w-[80%] rounded-xl px-3 py-2 ${
                       isSystem
-                        ? "bg-gray-100 text-gray-600 text-xs italic"
+                        ? "bg-surface text-text-muted text-xs italic"
                         : isOwnMessage
-                        ? "bg-blue-500 text-white"
-                        : "bg-gray-200 text-gray-800"
+                        ? "bg-violet text-white"
+                        : "bg-surface text-text"
                     }`}
                   >
                     {!isSystem && (
@@ -197,10 +197,10 @@ const Chat = ({ socket, roomId }) => {
                     <div
                       className={`text-xs mt-1 ${
                         isSystem
-                          ? "text-gray-500"
+                          ? "text-text-muted"
                           : isOwnMessage
-                          ? "text-blue-100"
-                          : "text-gray-500"
+                          ? "text-white/60"
+                          : "text-text-muted"
                       }`}
                     >
                       {formatTime(msg.timestamp)}
@@ -215,7 +215,7 @@ const Chat = ({ socket, roomId }) => {
           {/* Chat Input */}
           <form
             onSubmit={handleSendMessage}
-            className="p-3 border-t border-gray-200"
+            className="p-3 border-t border-border bg-surface"
           >
             <div className="flex gap-2">
               <input
@@ -224,14 +224,14 @@ const Chat = ({ socket, roomId }) => {
                 value={inputMessage}
                 onChange={(e) => setInputMessage(e.target.value)}
                 placeholder="Type a message..."
-                className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                className="input flex-1 py-2"
                 maxLength={500}
                 disabled={!socket?.connected}
               />
               <button
                 type="submit"
                 disabled={!inputMessage.trim() || !socket?.connected}
-                className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors text-sm font-semibold"
+                className="btn-primary px-4 py-2"
               >
                 Send
               </button>

@@ -1,9 +1,17 @@
 /**
  * Board Component
- * Renders the 3x3 TicTacToe grid
+ * Renders the 3x3 TicTacToe grid with modern styling
  */
 
+import { memo } from "react";
 import Cell from "./Cell.jsx";
+
+// Winning combinations
+const WINNING_LINES = [
+  [0, 1, 2], [3, 4, 5], [6, 7, 8], // rows
+  [0, 3, 6], [1, 4, 7], [2, 5, 8], // cols
+  [0, 4, 8], [2, 4, 6], // diagonals
+];
 
 /**
  * @param {Object} props
@@ -13,29 +21,60 @@ import Cell from "./Cell.jsx";
  * @param {Function} props.onCellClick - Cell click handler
  */
 function Board({ board, isMyTurn, winner, onCellClick }) {
-  return (
-    <div className="flex justify-center mb-6">
-      <div className="grid grid-cols-3 gap-2 bg-gray-200 dark:bg-gray-700 p-2 rounded-lg">
-        {Array.from({ length: 9 }, (_, i) => {
-          const row = Math.floor(i / 3);
-          const col = i % 3;
-          const value = board[row][col];
-          const isEmpty = value === null;
-          const isClickable = isMyTurn && isEmpty && winner === null;
+  // Find winning cells
+  const getWinningCells = () => {
+    if (!winner || winner === "draw") return [];
+    for (const [a, b, c] of WINNING_LINES) {
+      const rowA = Math.floor(a / 3), colA = a % 3;
+      const rowB = Math.floor(b / 3), colB = b % 3;
+      const rowC = Math.floor(c / 3), colC = c % 3;
+      if (board[rowA][colA] && 
+          board[rowA][colA] === board[rowB][colB] && 
+          board[rowA][colA] === board[rowC][colC]) {
+        return [a, b, c];
+      }
+    }
+    return [];
+  };
 
-          return (
-            <Cell
-              key={i}
-              value={value}
-              index={i}
-              isClickable={isClickable}
-              onClick={onCellClick}
-            />
-          );
-        })}
+  const winningCells = getWinningCells();
+
+  return (
+    <div className="flex justify-center items-center flex-1 py-4">
+      <div className="relative p-4 sm:p-6 rounded-2xl
+        bg-gradient-to-br from-slate-100 to-slate-50 
+        dark:from-slate-800/80 dark:to-slate-900/80
+        shadow-[0_8px_32px_rgba(0,0,0,0.12)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.4)]
+        border border-slate-200/50 dark:border-slate-700/30
+        backdrop-blur-sm">
+        
+        {/* Subtle glow effect */}
+        <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-blue-500/5 to-rose-500/5 pointer-events-none" />
+        
+        <div className="relative grid grid-cols-3 gap-2 sm:gap-3">
+          {Array.from({ length: 9 }, (_, i) => {
+            const row = Math.floor(i / 3);
+            const col = i % 3;
+            const value = board[row][col];
+            const isEmpty = value === null;
+            const isClickable = isMyTurn && isEmpty && winner === null;
+            const isWinningCell = winningCells.includes(i);
+
+            return (
+              <Cell
+                key={i}
+                value={value}
+                index={i}
+                isClickable={isClickable}
+                onClick={onCellClick}
+                isWinningCell={isWinningCell}
+              />
+            );
+          })}
+        </div>
       </div>
     </div>
   );
 }
 
-export default Board;
+export default memo(Board);

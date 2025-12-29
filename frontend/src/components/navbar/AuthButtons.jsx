@@ -8,23 +8,20 @@ export default function AuthButtons({
 }) {
   const navigate = useNavigate();
   const visibility = mobileVisible ? "block md:hidden" : "hidden md:block";
-  const size = mobileVisible
-    ? "px-3 py-1 text-sm rounded-full"
-    : "px-4 py-2 text-base rounded-full";
 
   return isLoggedIn ? (
     <button
       onClick={handleLogout}
-      className={`${visibility} ${size} bg-red-500 hover:bg-red-600 text-white font-semibold cursor-pointer`}
+      className={`${visibility} btn-ghost text-accent hover:bg-accent-soft active:scale-95 transition-all duration-200`}
     >
       Logout
     </button>
   ) : (
     <button
       onClick={handleLogin || (() => navigate("/auth"))}
-      className={`${visibility} ${size} bg-blue-500 hover:bg-blue-600 text-white font-semibold cursor-pointer`}
+      className={`${visibility} btn-primary py-2 px-5 text-sm active:scale-95`}
     >
-      Login
+      Sign In
     </button>
   );
 }
