@@ -1,7 +1,7 @@
 // worker.js
-import "dotenv/config.js";;
-import { connectDB } from './config/db.js';
-import { connectRedis } from './config/redis.js';
+import "dotenv/config.js";
+import { connectDB } from './src/config/db.js';
+import { connectRedis } from './src/config/redis.js';
 
 // Load environment variables
 
@@ -31,10 +31,10 @@ const startWorker = async () => {
 
     // 3. Import and start all workers
     console.log('📨 Starting Friend Request Worker...');
-    await import('./workers/friendRequestWorker.js');
+    await import('./src/workers/friendRequestWorker.js');
 
     console.log('🔔 Starting Notification Worker...');
-    await import('./workers/notificationWorker.js');
+    await import('./src/workers/notificationWorker.js');
 
     console.log('\n✅ All workers started successfully!');
     console.log('👂 Workers are now listening for jobs...');
@@ -55,7 +55,7 @@ process.on('SIGINT', async () => {
   console.log('\n⏹️  Shutting down workers gracefully...');
   
   try {
-    const { friendRequestQueue, notificationQueue } = await import('./config/queue.js');
+    const { friendRequestQueue, notificationQueue } = await import('./src/config/queue.js');
     
     // Close queues
     await friendRequestQueue.close();
@@ -63,7 +63,7 @@ process.on('SIGINT', async () => {
     console.log('✅ Queues closed');
 
     // Disconnect from databases
-    const { disconnectRedis } = await import('./config/redis.js');
+    const { disconnectRedis } = await import('./src/config/redis.js');
     await disconnectRedis();
     
     console.log('✅ Workers shut down successfully');
