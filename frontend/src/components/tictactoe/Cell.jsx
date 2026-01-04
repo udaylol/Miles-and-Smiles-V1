@@ -1,9 +1,19 @@
 /**
  * Cell Component
- * Individual square in the TicTacToe board with modern styling
+ * Individual square in the TicTacToe board with clean styling
  */
 
-import { memo } from "react";
+import { memo, useState } from "react";
+
+// Hardcoded colors for reliable rendering
+const COLORS = {
+  violet: "#8B7CF6",
+  accent: "#FF6B4A",
+  bgDeep: "#F5F0E8",
+  surface: "#FFFFFF",
+  border: "#E8E4DC",
+  textMuted: "#9C9488",
+};
 
 /**
  * @param {Object} props
@@ -14,38 +24,60 @@ import { memo } from "react";
  * @param {boolean} props.isWinningCell - Whether this cell is part of winning line
  */
 function Cell({ value, index, isClickable, onClick, isWinningCell }) {
+  const [isHovered, setIsHovered] = useState(false);
+
+  // Get cell style based on state
+  const getCellStyle = () => {
+    if (value === "X") {
+      return {
+        backgroundColor: "rgba(139, 124, 246, 0.1)",
+        borderColor: "rgba(139, 124, 246, 0.3)",
+        boxShadow: isWinningCell ? `0 0 0 2px ${COLORS.violet}, 0 8px 24px rgba(139, 124, 246, 0.25)` : "none",
+      };
+    }
+    if (value === "O") {
+      return {
+        backgroundColor: "rgba(255, 107, 74, 0.1)",
+        borderColor: "rgba(255, 107, 74, 0.3)",
+        boxShadow: isWinningCell ? `0 0 0 2px ${COLORS.accent}, 0 8px 24px rgba(255, 107, 74, 0.25)` : "none",
+      };
+    }
+    if (!isClickable) {
+      return {
+        backgroundColor: "rgba(245, 240, 232, 0.5)",
+        borderColor: "transparent",
+      };
+    }
+    // Empty clickable cell
+    return {
+      backgroundColor: isHovered ? COLORS.surface : COLORS.bgDeep,
+      borderColor: isHovered ? COLORS.textMuted : COLORS.border,
+    };
+  };
+
   return (
     <button
       onClick={() => onClick(index)}
       disabled={!isClickable}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
       className={`
         w-20 h-20 sm:w-24 sm:h-24
-        rounded-xl
+        rounded-xl border
         text-4xl sm:text-5xl font-bold
         transition-all duration-200
         flex items-center justify-center
         touch-manipulation
-        ${isClickable
-          ? "bg-slate-100/80 dark:bg-slate-700/50 hover:bg-slate-200 dark:hover:bg-slate-600 cursor-pointer active:scale-95 hover:shadow-lg"
-          : "cursor-not-allowed"
-        }
-        ${!value && !isClickable ? "bg-slate-100/40 dark:bg-slate-800/30" : ""}
-        ${!value && isClickable ? "bg-slate-100/80 dark:bg-slate-700/50" : ""}
-        ${value === "X"
-          ? `bg-blue-500/20 dark:bg-blue-500/30 ${isWinningCell ? "ring-2 ring-blue-500 shadow-[0_0_20px_rgba(59,130,246,0.5)]" : ""}`
-          : ""
-        }
-        ${value === "O"
-          ? `bg-rose-500/20 dark:bg-rose-500/30 ${isWinningCell ? "ring-2 ring-rose-500 shadow-[0_0_20px_rgba(244,63,94,0.5)]" : ""}`
-          : ""
-        }
+        ${isClickable ? "cursor-pointer active:scale-95" : "cursor-not-allowed"}
+        ${value ? "animate-scale-in" : ""}
       `}
+      style={getCellStyle()}
     >
       {value === "X" && (
-        <span className="text-blue-500 drop-shadow-sm">✕</span>
+        <span className="font-display" style={{ color: COLORS.violet }}>✕</span>
       )}
       {value === "O" && (
-        <span className="text-rose-500 drop-shadow-sm">○</span>
+        <span className="font-display" style={{ color: COLORS.accent }}>○</span>
       )}
     </button>
   );

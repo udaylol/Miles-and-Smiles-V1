@@ -36,7 +36,7 @@ export default function Favourites({ mobileVisible = false }) {
     <div className={`${visibility} items-center`}>
       <button
         onClick={handleFavoritesToggle}
-        className="p-2.5 rounded-xl hover:bg-accent-soft transition-all duration-200 active:scale-95"
+        className="p-2.5 rounded-xl transition-all duration-200 active:scale-95 hover:bg-accent-soft"
         title={
           showFavoritesOnly ? "Show all games" : "Show favorite games only"
         }
@@ -44,8 +44,8 @@ export default function Favourites({ mobileVisible = false }) {
         <Heart
           className={`${
             showFavoritesOnly 
-              ? "fill-accent text-accent" 
-              : "text-text-muted hover:text-accent"
+              ? "fill-red-500 text-red-500" 
+              : "text-text-muted hover:text-red-500"
           } transition-colors duration-200`}
           size={mobileVisible ? 18 : 20}
         />

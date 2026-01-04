@@ -9,9 +9,11 @@ import {
   Clock, 
   Send,
   Loader2,
-  Search
+  Search,
+  MessageCircle
 } from "lucide-react";
 import axiosClient from "../axiosClient.js";
+import FriendChat from "./FriendChat.jsx";
 
 const FriendsModal = ({ isOpen, onClose }) => {
   const [search, setSearch] = useState("");
@@ -19,6 +21,7 @@ const FriendsModal = ({ isOpen, onClose }) => {
   const [loading, setLoading] = useState(false);
   const [userData, setUserData] = useState(null);
   const [activeTab, setActiveTab] = useState("friends");
+  const [chatFriend, setChatFriend] = useState(null);
 
   const fetchUserData = useCallback(async () => {
     try {
@@ -325,13 +328,22 @@ const FriendsModal = ({ isOpen, onClose }) => {
                           key={friend._id || friend.userId || friend}
                           user={friend}
                           actions={
-                            <button
-                              onClick={() => handleRemoveFriend(friend._id || friend.userId)}
-                              disabled={loading}
-                              className="px-3 py-1.5 text-xs font-medium bg-bg-deep hover:bg-accent-soft hover:text-accent text-text-muted rounded-lg transition-colors disabled:opacity-50"
-                            >
-                              Remove
-                            </button>
+                            <div className="flex gap-2">
+                              <button
+                                onClick={() => setChatFriend(friend)}
+                                className="px-3 py-1.5 text-xs font-medium bg-violet-soft hover:bg-violet text-violet hover:text-white rounded-lg transition-colors flex items-center gap-1.5"
+                              >
+                                <MessageCircle size={14} />
+                                Chat
+                              </button>
+                              <button
+                                onClick={() => handleRemoveFriend(friend._id || friend.userId)}
+                                disabled={loading}
+                                className="px-3 py-1.5 text-xs font-medium bg-bg-deep hover:bg-accent-soft hover:text-accent text-text-muted rounded-lg transition-colors disabled:opacity-50"
+                              >
+                                Remove
+                              </button>
+                            </div>
                           }
                         />
                       ))
@@ -410,6 +422,14 @@ const FriendsModal = ({ isOpen, onClose }) => {
           </div>
         </div>
       </div>
+
+      {/* Friend Chat - Renders outside the modal */}
+      {chatFriend && (
+        <FriendChat 
+          friend={chatFriend} 
+          onClose={() => setChatFriend(null)} 
+        />
+      )}
     </>,
     document.body
   );

@@ -1,6 +1,6 @@
 /**
  * Memory Game Board Component
- * Displays the card grid layout
+ * Clean card grid layout
  */
 
 import Card from "./Card";
@@ -17,11 +17,11 @@ import Card from "./Card";
 function Board({ cards, gridSize = 4, onCardClick, disabled, showingMatch }) {
   return (
     <div className="w-full max-w-lg mx-auto">
-      {/* Board container with glassmorphism */}
-      <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-4 md:p-6 border border-white/10 shadow-2xl">
+      {/* Board container */}
+      <div className="bg-surface rounded-2xl p-4 md:p-6 border border-border">
         {/* Card grid */}
         <div 
-          className="grid gap-3 md:gap-4"
+          className="grid gap-2 md:gap-3"
           style={{
             gridTemplateColumns: `repeat(${gridSize}, minmax(0, 1fr))`,
           }}
@@ -39,10 +39,9 @@ function Board({ cards, gridSize = 4, onCardClick, disabled, showingMatch }) {
         
         {/* Empty state */}
         {cards.length === 0 && (
-          <div className="flex items-center justify-center h-64 text-white/50">
+          <div className="flex items-center justify-center h-64 text-text-muted">
             <div className="text-center">
-              <div className="text-5xl mb-4">🎴</div>
-              <p>Waiting for game to start...</p>
+              <p className="font-display text-lg">Waiting for game...</p>
             </div>
           </div>
         )}

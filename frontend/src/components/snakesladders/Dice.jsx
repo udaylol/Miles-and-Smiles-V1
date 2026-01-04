@@ -1,9 +1,21 @@
 /**
  * Dice Component
- * Animated 3D dice with roll functionality and time delay
+ * Clean dice with roll animation
  */
 
 import { memo, useState, useEffect } from "react";
+
+// Hardcoded colors for reliable rendering
+const COLORS = {
+  amber: "#F5A623",
+  emerald: "#2DD4A7",
+  accent: "#FF6B4A",
+  text: "#1A1714",
+  textMuted: "#9C9488",
+  surface: "#FFFFFF",
+  bgDeep: "#F5F0E8",
+  border: "#E8E4DC",
+};
 
 // Dice face patterns (dot positions for each face)
 const DICE_FACES = {
@@ -29,7 +41,10 @@ const DiceFace = memo(function DiceFace({ value }) {
           return (
             <div key={`${row}-${col}`} className="flex items-center justify-center">
               {hasDot && (
-                <div className="w-2 h-2 sm:w-3 sm:h-3 rounded-full bg-slate-800 dark:bg-slate-200 shadow-inner" />
+                <div 
+                  className="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full"
+                  style={{ backgroundColor: COLORS.text }}
+                />
               )}
             </div>
           );
@@ -40,30 +55,28 @@ const DiceFace = memo(function DiceFace({ value }) {
 });
 
 /**
- * Dice component with animation and delays
+ * Dice component with animation
  */
 function Dice({ value, isRolling, onRoll, disabled, extraTurn, moveInfo }) {
   const [displayValue, setDisplayValue] = useState(value || 1);
   const [animating, setAnimating] = useState(false);
   const [showResult, setShowResult] = useState(false);
   
-  // Animate dice during roll with longer duration
+  // Animate dice during roll
   useEffect(() => {
     if (isRolling) {
       setAnimating(true);
       setShowResult(false);
       
-      // Faster animation at start, slower at end
       let speed = 50;
       let count = 0;
-      const maxCount = 20; // ~1.5 seconds of rolling
+      const maxCount = 20;
       
       const animate = () => {
         setDisplayValue(Math.floor(Math.random() * 6) + 1);
         count++;
         
         if (count < maxCount) {
-          // Gradually slow down
           speed = 50 + (count * 10);
           setTimeout(animate, speed);
         }
@@ -73,7 +86,6 @@ function Dice({ value, isRolling, onRoll, disabled, extraTurn, moveInfo }) {
       
       return () => {};
     } else {
-      // Small delay before showing final result
       if (value && animating) {
         setTimeout(() => {
           setDisplayValue(value);
@@ -85,35 +97,60 @@ function Dice({ value, isRolling, onRoll, disabled, extraTurn, moveInfo }) {
         setShowResult(true);
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isRolling, value]);
+
+  // Get dice button styles
+  const getDiceStyle = () => {
+    const base = {
+      backgroundColor: COLORS.surface,
+      border: `1px solid ${COLORS.border}`,
+    };
+    
+    if (showResult && value === 6 && !isRolling) {
+      return {
+        ...base,
+        borderColor: COLORS.amber,
+        boxShadow: `0 4px 16px rgba(245, 166, 35, 0.3)`,
+      };
+    }
+    
+    if (disabled && !isRolling) {
+      return { ...base, opacity: 0.4 };
+    }
+    
+    return base;
+  };
+
+  // Get roll button styles
+  const getRollButtonStyle = () => {
+    if (isRolling) {
+      return { backgroundColor: COLORS.amber, color: "white" };
+    }
+    if (disabled) {
+      return { backgroundColor: COLORS.bgDeep, color: COLORS.textMuted };
+    }
+    return { backgroundColor: COLORS.emerald, color: "white" };
+  };
 
   return (
     <div className="flex flex-col items-center gap-3">
-      {/* Dice container with glow effect */}
-      <div className={`relative ${extraTurn && !isRolling ? "animate-pulse" : ""}`}>
-        {/* Glow ring for 6 */}
-        {showResult && value === 6 && !isRolling && (
-          <div className="absolute inset-0 -m-2 rounded-2xl bg-amber-400/30 blur-md animate-pulse" />
-        )}
-        
+      {/* Dice container */}
+      <div className="relative">
         {/* Dice */}
         <button
           onClick={onRoll}
           disabled={disabled || isRolling}
           className={`
-            relative w-16 h-16 sm:w-20 sm:h-20
-            bg-gradient-to-br from-white via-slate-50 to-slate-100
-            dark:from-slate-600 dark:via-slate-700 dark:to-slate-800
-            rounded-xl shadow-xl
-            border-2 border-slate-200 dark:border-slate-500
-            transition-all duration-200
-            ${animating ? "animate-[spin_0.1s_linear_infinite] scale-110" : ""}
+            relative w-14 h-14 sm:w-16 sm:h-16
+            rounded-xl transition-all duration-200
+            ${animating ? "animate-spin" : ""}
             ${disabled && !isRolling 
-              ? "opacity-50 cursor-not-allowed grayscale" 
-              : "hover:shadow-2xl hover:scale-110 active:scale-95 cursor-pointer"
+              ? "cursor-not-allowed" 
+              : "hover:scale-105 active:scale-95 cursor-pointer"
             }
-            ${showResult && value === 6 && !isRolling ? "ring-4 ring-amber-400 ring-opacity-70" : ""}
           `}
+          style={getDiceStyle()}
         >
           <DiceFace value={displayValue} />
         </button>
@@ -124,52 +161,39 @@ function Dice({ value, isRolling, onRoll, disabled, extraTurn, moveInfo }) {
         onClick={onRoll}
         disabled={disabled || isRolling}
         className={`
-          px-8 py-2.5 rounded-xl font-semibold text-sm
-          transition-all duration-300
-          ${isRolling
-            ? "bg-gradient-to-r from-amber-400 to-amber-500 text-white animate-pulse"
-            : disabled
-            ? "bg-slate-200 dark:bg-slate-700 text-slate-400 cursor-not-allowed"
-            : "bg-gradient-to-r from-emerald-500 to-emerald-600 text-white shadow-lg shadow-emerald-500/40 hover:shadow-xl hover:shadow-emerald-500/50 hover:scale-105 active:scale-95"
-          }
+          px-6 py-2 rounded-xl font-display font-semibold text-sm
+          transition-all duration-200
+          ${isRolling ? "animate-pulse" : ""}
+          ${disabled && !isRolling ? "cursor-not-allowed" : "hover:opacity-90 active:scale-95"}
         `}
+        style={getRollButtonStyle()}
       >
-        {isRolling ? "🎲 Rolling..." : disabled ? "⏳ Waiting..." : "🎲 Roll Dice"}
+        {isRolling ? "Rolling..." : disabled ? "Waiting..." : "Roll"}
       </button>
       
       {/* Extra turn indicator */}
       {extraTurn && !isRolling && (
-        <div className="px-4 py-2 rounded-xl bg-gradient-to-r from-amber-100 to-amber-200 dark:from-amber-900/50 dark:to-amber-800/50 text-amber-700 dark:text-amber-300 text-sm font-semibold animate-bounce shadow-lg">
-          🎉 Rolled 6! Roll again!
-        </div>
+        <p className="text-sm font-medium" style={{ color: COLORS.amber }}>
+          Rolled 6! Roll again
+        </p>
       )}
       
       {/* Move info display */}
       {moveInfo && showResult && !isRolling && (
-        <div className={`
-          px-4 py-2 rounded-xl text-sm font-medium text-center
-          ${moveInfo.snake 
-            ? "bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400" 
-            : moveInfo.ladder 
-            ? "bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400"
-            : moveInfo.bounce
-            ? "bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400"
-            : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300"
-          }
-        `}>
-          {moveInfo.snake && (
-            <span>🐍 Oops! Snake bit you! {moveInfo.from} → {moveInfo.finalPosition}</span>
-          )}
-          {moveInfo.ladder && (
-            <span>🪜 Yay! Climbed ladder! {moveInfo.from} → {moveInfo.finalPosition}</span>
-          )}
-          {moveInfo.bounce && (
-            <span>↩️ Bounced back! Need exact roll to finish.</span>
-          )}
-          {!moveInfo.snake && !moveInfo.ladder && !moveInfo.bounce && (
-            <span>Moved: {moveInfo.from || "Start"} → {moveInfo.finalPosition || moveInfo.to}</span>
-          )}
-        </div>
+        <p 
+          className="text-xs font-medium text-center"
+          style={{ 
+            color: moveInfo.snake ? COLORS.accent : 
+                   moveInfo.ladder ? COLORS.emerald : 
+                   COLORS.textMuted 
+          }}
+        >
+          {moveInfo.snake && `Snake! ${moveInfo.from} → ${moveInfo.finalPosition}`}
+          {moveInfo.ladder && `Ladder! ${moveInfo.from} → ${moveInfo.finalPosition}`}
+          {moveInfo.bounce && `Bounced back`}
+          {!moveInfo.snake && !moveInfo.ladder && !moveInfo.bounce && 
+            `${moveInfo.from || "Start"} → ${moveInfo.finalPosition || moveInfo.to}`}
+        </p>
       )}
     </div>
   );

@@ -1,10 +1,16 @@
 /**
  * Board Component
- * Renders the 3x3 TicTacToe grid with modern styling
+ * Renders the 3x3 TicTacToe grid with clean, modern styling
  */
 
 import { memo } from "react";
 import Cell from "./Cell.jsx";
+
+// Hardcoded colors for reliable rendering
+const COLORS = {
+  surface: "#FFFFFF",
+  border: "#E8E4DC",
+};
 
 // Winning combinations
 const WINNING_LINES = [
@@ -40,18 +46,16 @@ function Board({ board, isMyTurn, winner, onCellClick }) {
   const winningCells = getWinningCells();
 
   return (
-    <div className="flex justify-center items-center flex-1 py-4">
-      <div className="relative p-4 sm:p-6 rounded-2xl
-        bg-gradient-to-br from-slate-100 to-slate-50 
-        dark:from-slate-800/80 dark:to-slate-900/80
-        shadow-[0_8px_32px_rgba(0,0,0,0.12)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.4)]
-        border border-slate-200/50 dark:border-slate-700/30
-        backdrop-blur-sm">
-        
-        {/* Subtle glow effect */}
-        <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-blue-500/5 to-rose-500/5 pointer-events-none" />
-        
-        <div className="relative grid grid-cols-3 gap-2 sm:gap-3">
+    <div className="flex justify-center items-center flex-1 py-6 animate-fade-in">
+      <div 
+        className="relative p-3 rounded-2xl"
+        style={{
+          backgroundColor: COLORS.surface,
+          border: `1px solid ${COLORS.border}`,
+          boxShadow: "0 8px 32px rgba(26, 23, 20, 0.1)",
+        }}
+      >
+        <div className="grid grid-cols-3 gap-2">
           {Array.from({ length: 9 }, (_, i) => {
             const row = Math.floor(i / 3);
             const col = i % 3;

@@ -4,6 +4,7 @@ import Auth from "../pages/Auth.jsx";
 import GamePage from "../pages/GamePage.jsx";
 import ProtectedRoute from "../components/ProtectedRoute.jsx";
 import ProfilePage from "../pages/ProfilePage.jsx";
+import Chess from "../pages/Chess.jsx";
 
 function AppRouter() {
   return (
@@ -16,6 +17,22 @@ function AppRouter() {
           element={
             <ProtectedRoute>
               <GamePage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/chess"
+          element={
+            <ProtectedRoute>
+              <Chess />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/chess/:roomId"
+          element={
+            <ProtectedRoute>
+              <Chess />
             </ProtectedRoute>
           }
         />

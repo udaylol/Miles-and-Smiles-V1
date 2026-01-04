@@ -5,92 +5,135 @@
    A bold, human-crafted visual language. No AI clichés.
    ═══════════════════════════════════════════════════════════════════════════ */
 
+/* CSS Variables - Global Scope */
+:root {
+  /* ─── CORE PALETTE ─── */
+  /* Warm cream foundation - NOT cold whites */
+  --bg: #FAF7F2;
+  --bg-deep: #F5F0E8;
+  --surface: #FFFFFF;
+  --surface-raised: #FFFFFF;
+  
+  /* Ink blacks with warmth */
+  --text: #1A1714;
+  --text-secondary: #5C544A;
+  --text-muted: #9C9488;
+  
+  /* Electric coral - THE accent, committed */
+  --accent: #FF6B4A;
+  --accent-hover: #FF5233;
+  --accent-soft: #FFF0ED;
+  --accent-glow: rgba(255, 107, 74, 0.4);
+  
+  /* Supporting cast - used sparingly */
+  --emerald: #2DD4A7;
+  --emerald-soft: #E8FBF5;
+  --violet: #8B7CF6;
+  --violet-soft: #F3F1FE;
+  --amber: #F5A623;
+  --amber-soft: #FEF6E6;
+  
+  /* Structural */
+  --border: #E8E4DC;
+  --border-strong: #D4CEC2;
+  --card: var(--surface);
+  --input: var(--bg-deep);
+  
+  /* Semantic mappings */
+  --background: var(--bg);
+  --foreground: var(--text);
+  --muted: var(--text-muted);
+  --muted-foreground: var(--text-secondary);
+  --primary: var(--accent);
+  
+  /* Shadows with warmth */
+  --shadow-sm: 0 1px 2px rgba(26, 23, 20, 0.04);
+  --shadow-md: 0 4px 12px rgba(26, 23, 20, 0.08);
+  --shadow-lg: 0 12px 32px rgba(26, 23, 20, 0.12);
+  --shadow-glow: 0 0 40px var(--accent-glow);
+}
+
+html.dark {
+  /* Deep ink - NOT generic slate */
+  --bg: #0D0B09;
+  --bg-deep: #151310;
+  --surface: #1C1917;
+  --surface-raised: #262320;
+  
+  /* Cream text on dark */
+  --text: #FAF7F2;
+  --text-secondary: #C7C0B5;
+  --text-muted: #7A7368;
+  
+  /* Coral pops harder in dark */
+  --accent: #FF7A5C;
+  --accent-hover: #FF8E75;
+  --accent-soft: #2A1D19;
+  --accent-glow: rgba(255, 122, 92, 0.3);
+  
+  /* Supporting - adjusted for dark */
+  --emerald: #34E0B4;
+  --emerald-soft: #0D2621;
+  --violet: #9D8DF7;
+  --violet-soft: #1A1726;
+  --amber: #FFB84D;
+  --amber-soft: #2A2010;
+  
+  /* Structural */
+  --border: #2E2A26;
+  --border-strong: #3D3833;
+  --card: var(--surface);
+  --input: var(--bg-deep);
+  
+  /* Shadows for dark */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.5);
+}
+
+/* Tailwind v4 Theme Configuration */
+@theme {
+  /* Typography */
+  --font-display: "Clash Display", system-ui, sans-serif;
+  --font-body: "Satoshi", system-ui, sans-serif;
+  
+  /* Colors - Light Mode Defaults */
+  --color-bg: var(--bg);
+  --color-bg-deep: var(--bg-deep);
+  --color-surface: var(--surface);
+  --color-surface-raised: var(--surface-raised);
+  --color-text: var(--text);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-muted: var(--text-muted);
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-soft: var(--accent-soft);
+  --color-emerald: var(--emerald);
+  --color-emerald-soft: var(--emerald-soft);
+  --color-violet: var(--violet);
+  --color-violet-soft: var(--violet-soft);
+  --color-amber: var(--amber);
+  --color-amber-soft: var(--amber-soft);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  
+  /* Border radius */
+  --radius-2xl: 1rem;
+  --radius-3xl: 1.5rem;
+  --radius-4xl: 2rem;
+  
+  /* Box shadows */
+  --shadow-glow-accent: 0 0 40px rgba(255, 107, 74, 0.4);
+  
+  /* Animations */
+  --animate-page-reveal: pageReveal 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  --animate-hero: heroEntrance 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  --animate-float: float 6s ease-in-out infinite;
+  --animate-particle: particle 4s ease-in-out infinite;
+  --animate-shimmer: shimmer 2s ease-in-out infinite;
+}
+
 @layer base {
-  :root {
-    /* ─── CORE PALETTE ─── */
-    /* Warm cream foundation - NOT cold whites */
-    --bg: #FAF7F2;
-    --bg-deep: #F5F0E8;
-    --surface: #FFFFFF;
-    --surface-raised: #FFFFFF;
-    
-    /* Ink blacks with warmth */
-    --text: #1A1714;
-    --text-secondary: #5C544A;
-    --text-muted: #9C9488;
-    
-    /* Electric coral - THE accent, committed */
-    --accent: #FF6B4A;
-    --accent-hover: #FF5233;
-    --accent-soft: #FFF0ED;
-    --accent-glow: rgba(255, 107, 74, 0.4);
-    
-    /* Supporting cast - used sparingly */
-    --emerald: #2DD4A7;
-    --emerald-soft: #E8FBF5;
-    --violet: #8B7CF6;
-    --violet-soft: #F3F1FE;
-    --amber: #F5A623;
-    --amber-soft: #FEF6E6;
-    
-    /* Structural */
-    --border: #E8E4DC;
-    --border-strong: #D4CEC2;
-    --card: var(--surface);
-    --input: var(--bg-deep);
-    
-    /* Semantic mappings */
-    --background: var(--bg);
-    --foreground: var(--text);
-    --muted: var(--text-muted);
-    --muted-foreground: var(--text-secondary);
-    --primary: var(--accent);
-    
-    /* Shadows with warmth */
-    --shadow-sm: 0 1px 2px rgba(26, 23, 20, 0.04);
-    --shadow-md: 0 4px 12px rgba(26, 23, 20, 0.08);
-    --shadow-lg: 0 12px 32px rgba(26, 23, 20, 0.12);
-    --shadow-glow: 0 0 40px var(--accent-glow);
-  }
-
-  html.dark {
-    /* Deep ink - NOT generic slate */
-    --bg: #0D0B09;
-    --bg-deep: #151310;
-    --surface: #1C1917;
-    --surface-raised: #262320;
-    
-    /* Cream text on dark */
-    --text: #FAF7F2;
-    --text-secondary: #C7C0B5;
-    --text-muted: #7A7368;
-    
-    /* Coral pops harder in dark */
-    --accent: #FF7A5C;
-    --accent-hover: #FF8E75;
-    --accent-soft: #2A1D19;
-    --accent-glow: rgba(255, 122, 92, 0.3);
-    
-    /* Supporting - adjusted for dark */
-    --emerald: #34E0B4;
-    --emerald-soft: #0D2621;
-    --violet: #9D8DF7;
-    --violet-soft: #1A1726;
-    --amber: #FFB84D;
-    --amber-soft: #2A2010;
-    
-    /* Structural */
-    --border: #2E2A26;
-    --border-strong: #3D3833;
-    --card: var(--surface);
-    --input: var(--bg-deep);
-    
-    /* Shadows for dark */
-    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
-    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
-    --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.5);
-  }
-
   /* ─── TYPOGRAPHY ─── */
   html {
     font-family: 'Satoshi', system-ui, sans-serif;
@@ -231,13 +274,67 @@
     }
   }
 
-  @keyframes shimmer {
+  @keyframes bounceIn {
     0% {
-      background-position: -200% 0;
+      opacity: 0;
+      transform: scale(0.3);
+    }
+    50% {
+      transform: scale(1.05);
     }
     100% {
-      background-position: 200% 0;
+      opacity: 1;
+      transform: scale(1);
     }
+  }
+
+  @keyframes shimmer {
+    0% {
+      transform: translateX(-100%);
+    }
+    100% {
+      transform: translateX(100%);
+    }
+  }
+
+  @keyframes particle {
+    0%, 100% {
+      transform: translateY(0) translateX(0) scale(1);
+      opacity: 0;
+    }
+    10% {
+      opacity: 1;
+    }
+    50% {
+      transform: translateY(-30px) translateX(10px) scale(1.5);
+      opacity: 0.8;
+    }
+    90% {
+      opacity: 0.3;
+    }
+  }
+
+  @keyframes scan {
+    0% {
+      transform: translateY(-100%);
+    }
+    100% {
+      transform: translateY(100%);
+    }
+  }
+
+  @keyframes typewriter {
+    from { width: 0; }
+    to { width: 100%; }
+  }
+
+  @keyframes blink {
+    50% { border-color: transparent; }
+  }
+
+  @keyframes marquee {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
   }
 
   /* Animation classes */
@@ -273,8 +370,36 @@
     animation: fadeIn 0.3s ease-out;
   }
 
+  .animate-fade-in {
+    animation: fadeIn 0.4s ease-out forwards;
+  }
+
   .animate-scaleIn {
     animation: scaleIn 0.2s ease-out;
+  }
+
+  .animate-scale-in {
+    animation: scaleIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  .animate-bounce-in {
+    animation: bounceIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  .animate-scan {
+    animation: scan 0.8s ease-in-out infinite;
+  }
+
+  .animate-marquee {
+    animation: marquee 20s linear infinite;
+  }
+
+  .animate-shimmer {
+    animation: shimmer 2s ease-in-out infinite;
+  }
+
+  .animate-particle {
+    animation: particle 4s ease-in-out infinite;
   }
 
   /* ─── INTERACTIVE STATES ─── */

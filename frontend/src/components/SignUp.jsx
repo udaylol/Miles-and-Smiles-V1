@@ -33,7 +33,7 @@ export default function SignUp({ onMessage }) {
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-5">
-      <div className="group">
+      <div className="group animate-fadeIn" style={{ animationDelay: '0.1s' }}>
         <label className="block text-sm font-medium text-text-secondary mb-2 group-focus-within:text-accent transition-colors">
           Username
         </label>
@@ -43,10 +43,10 @@ export default function SignUp({ onMessage }) {
           placeholder="Choose a username"
           value={userData.username}
           onChange={handleChange}
-          className="input"
+          className="input focus:scale-[1.02] transition-transform"
         />
       </div>
-      <div className="group">
+      <div className="group animate-fadeIn" style={{ animationDelay: '0.2s' }}>
         <label className="block text-sm font-medium text-text-secondary mb-2 group-focus-within:text-accent transition-colors">
           Password
         </label>
@@ -56,12 +56,13 @@ export default function SignUp({ onMessage }) {
           placeholder="Create a password"
           value={userData.password}
           onChange={handleChange}
-          className="input"
+          className="input focus:scale-[1.02] transition-transform"
         />
       </div>
       <button
         type="submit"
-        className="btn-primary w-full mt-3"
+        className="btn-primary w-full mt-3 animate-fadeIn hover:scale-[1.02] active:scale-[0.98] transition-transform"
+        style={{ animationDelay: '0.3s' }}
       >
         Create Account
       </button>

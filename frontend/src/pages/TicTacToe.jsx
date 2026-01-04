@@ -1,6 +1,6 @@
 /**
  * TicTacToe Main Component
- * Main game controller with bold visual identity
+ * Clean, typography-driven game interface
  */
 
 import { useTicTacToeGame } from "../components/tictactoe/useTicTacToeGame.js";
@@ -37,77 +37,81 @@ function TicTacToe({ roomData }) {
   const playerOName = playerInfo?.O?.username || "Player O";
 
   return (
-    <div className="game-shell min-h-screen bg-bg font-body grain overflow-hidden">
-      {/* Background elements */}
-      <div className="fixed inset-0 geo-pattern pointer-events-none opacity-40" />
-      <div className="fixed top-20 left-[10%] w-32 h-32 rounded-full bg-violet/10 blur-3xl animate-float" />
-      <div className="fixed bottom-20 right-[10%] w-40 h-40 rounded-full bg-accent/10 blur-3xl animate-float" style={{ animationDelay: '-2s' }} />
+    <div className="game-shell min-h-screen bg-bg font-body overflow-hidden">
+      {/* Layered background */}
+      <div className="fixed inset-0 bg-gradient-to-b from-bg via-bg to-bg-deep" />
+      <div className="fixed inset-0 geo-pattern pointer-events-none opacity-30" />
+      
+      {/* Accent glow - subtle, positioned */}
+      <div className="fixed top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-violet/5 blur-[100px] pointer-events-none" />
       
       {/* Exit Button */}
       <ExitButton socket={socket} roomId={roomId} />
 
       {/* Main Game Container */}
-      <div className="relative h-screen flex flex-col px-4 sm:px-6 py-4 sm:py-6 max-w-xl mx-auto">
+      <div className="relative min-h-screen flex flex-col px-4 sm:px-6 py-6 max-w-md mx-auto">
         
-        {/* Header - Compact */}
-        <header className="flex-shrink-0 text-center mb-4 sm:mb-6 animate-hero">
-          <h1 className="font-display text-2xl sm:text-3xl font-semibold text-text">
+        {/* Header - Typography focused */}
+        <header className="flex-shrink-0 text-center mb-6">
+          <p className="text-[10px] uppercase tracking-[0.2em] text-text-muted mb-2 font-medium">
+            Room {roomId}
+          </p>
+          <h1 className="font-display text-3xl sm:text-4xl font-semibold text-text tracking-tight">
             Tic Tac Toe
           </h1>
-          <p className="text-xs text-text-muted font-mono tracking-wider mt-1">
-            {roomId}
-          </p>
         </header>
 
-        {/* Player Info Bar */}
+        {/* Players - Clean horizontal layout */}
         {gameStarted && winner === null && (
-          <div className="flex items-center justify-center gap-4 sm:gap-6 mb-4 animate-fadeIn">
+          <div className="flex items-stretch justify-between gap-3 mb-6">
             {/* Player X */}
-            <div className={`flex items-center gap-3 px-4 py-3 rounded-2xl transition-all ${
+            <div className={`flex-1 p-4 rounded-2xl border transition-all duration-300 ${
               turn === "X" 
-                ? "bg-violet-soft border border-violet/30 shadow-md" 
-                : "bg-surface border border-border"
+                ? "bg-surface border-violet/40 shadow-lg shadow-violet/10" 
+                : "bg-surface/50 border-border"
             }`}>
-              <div className={`relative ${turn === "X" ? "animate-pulse" : ""}`}>
-                <div className="w-10 h-10 rounded-xl bg-violet flex items-center justify-center shadow-sm">
-                  <span className="text-white font-display font-bold">
-                    {playerXName.charAt(0).toUpperCase()}
-                  </span>
+              <div className="flex items-center gap-3">
+                <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-display text-xl font-bold ${
+                  turn === "X" ? "bg-violet text-white" : "bg-bg-deep text-text-muted"
+                }`}>
+                  ✕
                 </div>
-                {mySymbol === "X" && (
-                  <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald rounded-full border-2 border-surface" />
+                <div className="min-w-0 flex-1">
+                  <p className="text-[10px] uppercase tracking-wider text-text-muted">
+                    {mySymbol === "X" ? "You" : "Opponent"}
+                  </p>
+                  <p className="font-display font-semibold text-text truncate">
+                    {playerXName}
+                  </p>
+                </div>
+                {turn === "X" && (
+                  <div className="w-2 h-2 rounded-full bg-violet animate-pulse" />
                 )}
-              </div>
-              <div className="min-w-0">
-                <div className="text-xs text-text-muted truncate max-w-[70px]">
-                  {mySymbol === "X" ? "You" : playerXName}
-                </div>
-                <div className="font-display text-xl font-bold text-violet">✕</div>
               </div>
             </div>
             
-            <span className="text-text-muted text-sm font-display font-medium">vs</span>
-            
             {/* Player O */}
-            <div className={`flex items-center gap-3 px-4 py-3 rounded-2xl transition-all ${
+            <div className={`flex-1 p-4 rounded-2xl border transition-all duration-300 ${
               turn === "O" 
-                ? "bg-accent-soft border border-accent/30 shadow-md" 
-                : "bg-surface border border-border"
+                ? "bg-surface border-accent/40 shadow-lg shadow-accent/10" 
+                : "bg-surface/50 border-border"
             }`}>
-              <div className="min-w-0 text-right">
-                <div className="text-xs text-text-muted truncate max-w-[70px]">
-                  {mySymbol === "O" ? "You" : playerOName}
+              <div className="flex items-center gap-3">
+                <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-display text-xl font-bold ${
+                  turn === "O" ? "bg-accent text-white" : "bg-bg-deep text-text-muted"
+                }`}>
+                  ○
                 </div>
-                <div className="font-display text-xl font-bold text-accent">○</div>
-              </div>
-              <div className={`relative ${turn === "O" ? "animate-pulse" : ""}`}>
-                <div className="w-10 h-10 rounded-xl bg-accent flex items-center justify-center shadow-sm">
-                  <span className="text-white font-display font-bold">
-                    {playerOName.charAt(0).toUpperCase()}
-                  </span>
+                <div className="min-w-0 flex-1">
+                  <p className="text-[10px] uppercase tracking-wider text-text-muted">
+                    {mySymbol === "O" ? "You" : "Opponent"}
+                  </p>
+                  <p className="font-display font-semibold text-text truncate">
+                    {playerOName}
+                  </p>
                 </div>
-                {mySymbol === "O" && (
-                  <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald rounded-full border-2 border-surface" />
+                {turn === "O" && (
+                  <div className="w-2 h-2 rounded-full bg-accent animate-pulse" />
                 )}
               </div>
             </div>

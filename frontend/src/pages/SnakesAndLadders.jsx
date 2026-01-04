@@ -1,6 +1,6 @@
 /**
  * Snakes and Ladders Main Component
- * Main game controller with modern UI matching TicTacToe and DotsAndBoxes
+ * Clean, typography-driven game interface
  */
 
 import { useSnakesAndLaddersGame } from "../components/snakesladders/useSnakesAndLaddersGame.js";
@@ -46,93 +46,88 @@ function SnakesAndLadders({ roomData }) {
   const player2Name = playerInfo[2]?.username || "Player 2";
 
   return (
-    <div className="game-shell min-h-screen bg-bg font-body grain overflow-hidden">
-      {/* Background elements */}
-      <div className="fixed inset-0 geo-pattern pointer-events-none opacity-40" />
-      <div className="fixed top-20 left-[10%] w-32 h-32 rounded-full bg-emerald/10 blur-3xl animate-float" />
-      <div className="fixed bottom-20 right-[10%] w-40 h-40 rounded-full bg-amber/10 blur-3xl animate-float" style={{ animationDelay: '-2s' }} />
+    <div className="game-shell min-h-screen bg-bg font-body overflow-hidden">
+      {/* Layered background */}
+      <div className="fixed inset-0 bg-gradient-to-b from-bg via-bg to-bg-deep" />
+      <div className="fixed inset-0 geo-pattern pointer-events-none opacity-30" />
+      
+      {/* Accent glow */}
+      <div className="fixed top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-emerald/5 blur-[100px] pointer-events-none" />
       
       {/* Exit Button */}
       <ExitButton socket={socket} roomId={roomId} />
 
       {/* Main Game Container */}
-      <div className="relative min-h-screen flex flex-col px-4 sm:px-6 py-4 sm:py-6 max-w-lg mx-auto">
+      <div className="relative min-h-screen flex flex-col px-4 sm:px-6 py-6 max-w-lg mx-auto">
         
         {/* Header */}
-        <header className="flex-shrink-0 text-center mb-3 sm:mb-4 animate-hero">
-          <h1 className="font-display text-xl sm:text-2xl font-semibold text-text">
-            🐍 Snakes & Ladders 🪜
-          </h1>
-          <p className="text-xs text-text-muted font-mono tracking-wider mt-1">
-            Room: {roomId}
+        <header className="flex-shrink-0 text-center mb-4">
+          <p className="text-[10px] uppercase tracking-[0.2em] text-text-muted mb-2 font-medium">
+            Room {roomId}
           </p>
+          <h1 className="font-display text-2xl sm:text-3xl font-semibold text-text tracking-tight">
+            Snakes & Ladders
+          </h1>
         </header>
 
-        {/* Player Info Bar */}
+        {/* Players - Clean horizontal layout */}
         {gameStarted && winner === null && (
-          <div className="flex items-center justify-center gap-4 sm:gap-6 mb-4 animate-fadeIn">
+          <div className="flex items-stretch justify-between gap-3 mb-4">
             {/* Player 1 */}
-            <div className={`flex items-center gap-3 px-4 py-3 rounded-2xl transition-all duration-300 ${
+            <div className={`flex-1 p-4 rounded-2xl border transition-all duration-300 ${
               currentTurn === 1 && !isAnimating
-                ? "bg-emerald-soft border border-emerald/30 shadow-md scale-105" 
-                : "bg-surface border border-border"
-            } ${animatingPlayer === 1 ? "ring-2 ring-emerald/50 animate-pulse" : ""}`}>
-              <div className={`relative ${currentTurn === 1 && !isAnimating ? "animate-bounce" : ""}`} style={{ animationDuration: "1.5s" }}>
-                <div className="w-10 h-10 rounded-xl bg-emerald flex items-center justify-center shadow-sm">
-                  <span className="text-white font-display font-bold">
-                    {player1Name.charAt(0).toUpperCase()}
-                  </span>
+                ? "bg-surface border-emerald/40 shadow-lg shadow-emerald/10" 
+                : "bg-surface/50 border-border"
+            }`}>
+              <div className="flex items-center gap-3">
+                <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-display text-lg font-bold ${
+                  currentTurn === 1 && !isAnimating ? "bg-emerald text-white" : "bg-bg-deep text-text-muted"
+                }`}>
+                  {player1Name.charAt(0).toUpperCase()}
                 </div>
-                {myPlayerNumber === 1 && (
-                  <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-violet rounded-full border-2 border-surface" />
+                <div className="min-w-0 flex-1">
+                  <p className="text-[10px] uppercase tracking-wider text-text-muted">
+                    {myPlayerNumber === 1 ? "You" : "Opponent"}
+                  </p>
+                  <p className="font-display text-lg font-bold text-text">
+                    {positions[1] === 0 ? "Start" : positions[1]}
+                  </p>
+                </div>
+                {currentTurn === 1 && !isAnimating && (
+                  <div className="w-2 h-2 rounded-full bg-emerald animate-pulse" />
                 )}
               </div>
-              <div className="min-w-0">
-                <div className="text-xs text-text-muted truncate max-w-[60px] font-medium">
-                  {myPlayerNumber === 1 ? "You" : player1Name}
-                </div>
-                <div className="font-display text-lg font-bold text-emerald">
-                  {positions[1] === 0 ? "🏁" : positions[1]}
-                </div>
-              </div>
-            </div>
-            
-            <div className="flex flex-col items-center">
-              <span className="text-text-muted text-xs font-display font-medium">VS</span>
-              {isAnimating && (
-                <span className="text-[10px] text-amber animate-pulse mt-0.5">Moving...</span>
-              )}
             </div>
             
             {/* Player 2 */}
-            <div className={`flex items-center gap-3 px-4 py-3 rounded-2xl transition-all duration-300 ${
+            <div className={`flex-1 p-4 rounded-2xl border transition-all duration-300 ${
               currentTurn === 2 && !isAnimating
-                ? "bg-amber-soft border border-amber/30 shadow-md scale-105" 
-                : "bg-surface border border-border"
-            } ${animatingPlayer === 2 ? "ring-2 ring-amber/50 animate-pulse" : ""}`}>
-              <div className="min-w-0 text-right">
-                <div className="text-xs text-text-muted truncate max-w-[60px] font-medium">
-                  {myPlayerNumber === 2 ? "You" : player2Name}
+                ? "bg-surface border-amber/40 shadow-lg shadow-amber/10" 
+                : "bg-surface/50 border-border"
+            }`}>
+              <div className="flex items-center gap-3">
+                <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-display text-lg font-bold ${
+                  currentTurn === 2 && !isAnimating ? "bg-amber text-white" : "bg-bg-deep text-text-muted"
+                }`}>
+                  {player2Name.charAt(0).toUpperCase()}
                 </div>
-                <div className="font-display text-lg font-bold text-amber">
-                  {positions[2] === 0 ? "🏁" : positions[2]}
+                <div className="min-w-0 flex-1">
+                  <p className="text-[10px] uppercase tracking-wider text-text-muted">
+                    {myPlayerNumber === 2 ? "You" : "Opponent"}
+                  </p>
+                  <p className="font-display text-lg font-bold text-text">
+                    {positions[2] === 0 ? "Start" : positions[2]}
+                  </p>
                 </div>
-              </div>
-              <div className={`relative ${currentTurn === 2 && !isAnimating ? "animate-bounce" : ""}`} style={{ animationDuration: "1.5s" }}>
-                <div className="w-10 h-10 rounded-xl bg-amber flex items-center justify-center shadow-sm">
-                  <span className="text-white font-display font-bold">
-                    {player2Name.charAt(0).toUpperCase()}
-                  </span>
-                </div>
-                {myPlayerNumber === 2 && (
-                  <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-violet rounded-full border-2 border-surface" />
+                {currentTurn === 2 && !isAnimating && (
+                  <div className="w-2 h-2 rounded-full bg-amber animate-pulse" />
                 )}
               </div>
             </div>
           </div>
         )}
 
-        {/* Game Info - Shows waiting/reconnecting/gameover states */}
+        {/* Game Info */}
         <GameInfo
           gameStarted={gameStarted}
           opponentLeft={opponentLeft}

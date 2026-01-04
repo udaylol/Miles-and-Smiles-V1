@@ -1,9 +1,21 @@
 /**
  * Snakes and Ladders Board Component
- * 10x10 board with snakes and ladders visualization showing destinations
+ * Clean 10x10 board with snakes and ladders
  */
 
 import { memo, useMemo } from "react";
+
+// Hardcoded colors for reliable rendering
+const COLORS = {
+  amber: "#F5A623",
+  emerald: "#2DD4A7",
+  accent: "#FF6B4A",
+  surface: "#FFFFFF",
+  bgDeep: "#F5F0E8",
+  border: "#E8E4DC",
+  borderLight: "rgba(232, 228, 220, 0.5)",
+  textMuted: "#9C9488",
+};
 
 /**
  * Get the position number for a cell (zigzag numbering from bottom-left)
@@ -16,7 +28,7 @@ function getCellPosition(row, col) {
 }
 
 /**
- * Cell component with enhanced visuals
+ * Cell component - clean and minimal
  */
 const Cell = memo(function Cell({ 
   position, 
@@ -31,45 +43,48 @@ const Cell = memo(function Cell({
   const hasSnake = snakeData !== null;
   const hasLadder = ladderData !== null;
   
-  // Determine cell background based on position and special tiles
-  const getCellBg = () => {
-    if (isFinish) return "bg-gradient-to-br from-amber-200 to-amber-300 dark:from-amber-700 dark:to-amber-800";
-    if (position === 1) return "bg-gradient-to-br from-emerald-200 to-emerald-300 dark:from-emerald-700 dark:to-emerald-800";
-    if (hasSnake) return "bg-gradient-to-br from-red-100 to-red-200 dark:from-red-900/50 dark:to-red-800/50";
-    if (hasLadder) return "bg-gradient-to-br from-green-100 to-green-200 dark:from-green-900/50 dark:to-green-800/50";
-    return position % 2 === 0 
-      ? "bg-slate-100 dark:bg-slate-800" 
-      : "bg-white dark:bg-slate-900";
+  // Get cell style based on content
+  const getCellStyle = () => {
+    if (isFinish) return { backgroundColor: "rgba(245, 166, 35, 0.2)" };
+    if (position === 1) return { backgroundColor: "rgba(45, 212, 167, 0.2)" };
+    if (hasSnake) return { backgroundColor: "rgba(255, 107, 74, 0.1)" };
+    if (hasLadder) return { backgroundColor: "rgba(45, 212, 167, 0.1)" };
+    return { backgroundColor: position % 2 === 0 ? COLORS.bgDeep : COLORS.surface };
+  };
+
+  // Get number color based on cell type
+  const getNumberColor = () => {
+    if (isFinish) return COLORS.amber;
+    if (position === 1) return COLORS.emerald;
+    if (hasSnake) return COLORS.accent;
+    if (hasLadder) return COLORS.emerald;
+    return COLORS.textMuted;
   };
   
   return (
     <div
-      className={`
-        relative aspect-square flex items-center justify-center
-        border border-slate-300/50 dark:border-slate-600/50
-        transition-all duration-300
-        ${getCellBg()}
-        ${hasSnake ? "shadow-inner shadow-red-500/20" : ""}
-        ${hasLadder ? "shadow-inner shadow-green-500/20" : ""}
-      `}
+      className="relative aspect-square flex items-center justify-center transition-colors"
+      style={{ 
+        ...getCellStyle(),
+        border: `1px solid ${COLORS.borderLight}`,
+      }}
     >
       {/* Position number - top left */}
-      <span className={`
-        absolute top-0 left-0.5 text-[7px] sm:text-[9px] font-bold
-        ${isFinish ? "text-amber-700 dark:text-amber-300" : ""}
-        ${position === 1 ? "text-emerald-700 dark:text-emerald-300" : ""}
-        ${hasSnake ? "text-red-600 dark:text-red-400" : ""}
-        ${hasLadder ? "text-green-600 dark:text-green-400" : ""}
-        ${!isFinish && position !== 1 && !hasSnake && !hasLadder ? "text-slate-500 dark:text-slate-500" : ""}
-      `}>
+      <span 
+        className="absolute top-0 left-0.5 text-[7px] sm:text-[8px] font-medium"
+        style={{ color: getNumberColor() }}
+      >
         {position}
       </span>
       
       {/* Snake indicator with destination */}
       {hasSnake && (
         <div className="flex flex-col items-center justify-center">
-          <span className="text-sm sm:text-base leading-none">🐍</span>
-          <span className="text-[6px] sm:text-[8px] font-bold text-red-600 dark:text-red-400 leading-none mt-0.5">
+          <span className="text-xs sm:text-sm leading-none animate-float">🐍</span>
+          <span 
+            className="text-[6px] sm:text-[7px] font-bold leading-none mt-0.5"
+            style={{ color: COLORS.accent }}
+          >
             →{snakeData.tail}
           </span>
         </div>
@@ -78,8 +93,11 @@ const Cell = memo(function Cell({
       {/* Ladder indicator with destination */}
       {hasLadder && (
         <div className="flex flex-col items-center justify-center">
-          <span className="text-sm sm:text-base leading-none">🪜</span>
-          <span className="text-[6px] sm:text-[8px] font-bold text-green-600 dark:text-green-400 leading-none mt-0.5">
+          <span className="text-xs sm:text-sm leading-none animate-float">🪜</span>
+          <span 
+            className="text-[6px] sm:text-[7px] font-bold leading-none mt-0.5"
+            style={{ color: COLORS.emerald }}
+          >
             →{ladderData.top}
           </span>
         </div>
@@ -87,12 +105,17 @@ const Cell = memo(function Cell({
       
       {/* Finish indicator */}
       {isFinish && !hasSnake && !hasLadder && (
-        <span className="text-sm sm:text-lg">🏆</span>
+        <span className="text-sm sm:text-base">🏆</span>
       )}
       
       {/* Start indicator */}
       {position === 1 && !hasLadder && (
-        <span className="text-[8px] sm:text-xs font-bold text-emerald-600 dark:text-emerald-400">START</span>
+        <span 
+          className="text-[7px] sm:text-[8px] font-bold"
+          style={{ color: COLORS.emerald }}
+        >
+          START
+        </span>
       )}
       
       {/* Players tokens */}
@@ -100,29 +123,33 @@ const Cell = memo(function Cell({
         {player1Here && (
           <div 
             className={`
-              w-3.5 h-3.5 sm:w-5 sm:h-5 rounded-full 
-              bg-gradient-to-br from-emerald-400 to-emerald-600 
-              shadow-md shadow-emerald-500/50
-              border-2 border-white dark:border-slate-800
+              w-3 h-3 sm:w-4 sm:h-4 rounded-full 
+              border border-white
               flex items-center justify-center
-              ${player1Animating ? "animate-bounce scale-125" : "transition-all duration-500"}
+              ${player1Animating ? "animate-pulse scale-110" : "transition-all duration-300"}
             `}
+            style={{ 
+              backgroundColor: COLORS.emerald,
+              boxShadow: player1Animating ? `0 0 12px ${COLORS.emerald}` : "none",
+            }}
           >
-            <span className="text-[6px] sm:text-[8px] font-bold text-white">1</span>
+            <span className="text-[5px] sm:text-[6px] font-bold text-white">1</span>
           </div>
         )}
         {player2Here && (
           <div 
             className={`
-              w-3.5 h-3.5 sm:w-5 sm:h-5 rounded-full 
-              bg-gradient-to-br from-amber-400 to-amber-600 
-              shadow-md shadow-amber-500/50
-              border-2 border-white dark:border-slate-800
+              w-3 h-3 sm:w-4 sm:h-4 rounded-full 
+              border border-white
               flex items-center justify-center
-              ${player2Animating ? "animate-bounce scale-125" : "transition-all duration-500"}
+              ${player2Animating ? "animate-pulse scale-110" : "transition-all duration-300"}
             `}
+            style={{ 
+              backgroundColor: COLORS.amber,
+              boxShadow: player2Animating ? `0 0 12px ${COLORS.amber}` : "none",
+            }}
           >
-            <span className="text-[6px] sm:text-[8px] font-bold text-white">2</span>
+            <span className="text-[5px] sm:text-[6px] font-bold text-white">2</span>
           </div>
         )}
       </div>
@@ -174,15 +201,21 @@ function Board({ positions, snakes, ladders, animatingPlayer }) {
   }, [positions, snakeMap, ladderMap, animatingPlayer]);
 
   return (
-    <div className="w-full max-w-md mx-auto">
-      {/* Board container with glassmorphism */}
-      <div className="relative bg-white/70 dark:bg-slate-800/70 backdrop-blur-md rounded-2xl p-2 sm:p-3 shadow-2xl border border-white/30 dark:border-slate-700/50">
-        {/* Decorative corner icons */}
-        <div className="absolute -top-2 -left-2 w-8 h-8 bg-emerald-500 rounded-full flex items-center justify-center shadow-lg text-white text-xs font-bold z-10">🎲</div>
-        <div className="absolute -top-2 -right-2 w-8 h-8 bg-amber-500 rounded-full flex items-center justify-center shadow-lg text-white text-xs font-bold z-10">🏆</div>
-        
+    <div className="w-full max-w-md mx-auto animate-fade-in">
+      {/* Board container */}
+      <div 
+        className="relative rounded-2xl p-2 sm:p-3"
+        style={{
+          backgroundColor: COLORS.surface,
+          border: `1px solid ${COLORS.border}`,
+          boxShadow: "0 8px 32px rgba(26, 23, 20, 0.1)",
+        }}
+      >
         {/* Grid */}
-        <div className="grid grid-cols-10 gap-0 rounded-xl overflow-hidden border-2 border-slate-300 dark:border-slate-600 shadow-inner">
+        <div 
+          className="grid grid-cols-10 gap-0 rounded-xl overflow-hidden"
+          style={{ border: `1px solid ${COLORS.border}` }}
+        >
           {board.map((cell) => (
             <Cell
               key={cell.position}
@@ -200,13 +233,19 @@ function Board({ positions, snakes, ladders, animatingPlayer }) {
         
         {/* Legend */}
         <div className="mt-3 flex items-center justify-center gap-4 text-[10px] sm:text-xs">
-          <div className="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-red-100 dark:bg-red-900/30">
+          <div 
+            className="flex items-center gap-1.5 px-2 py-1 rounded-lg"
+            style={{ backgroundColor: "rgba(255, 107, 74, 0.1)" }}
+          >
             <span>🐍</span>
-            <span className="text-red-600 dark:text-red-400 font-medium">Snake (↓)</span>
+            <span className="font-medium" style={{ color: COLORS.accent }}>Down</span>
           </div>
-          <div className="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-green-100 dark:bg-green-900/30">
+          <div 
+            className="flex items-center gap-1.5 px-2 py-1 rounded-lg"
+            style={{ backgroundColor: "rgba(45, 212, 167, 0.1)" }}
+          >
             <span>🪜</span>
-            <span className="text-green-600 dark:text-green-400 font-medium">Ladder (↑)</span>
+            <span className="font-medium" style={{ color: COLORS.emerald }}>Up</span>
           </div>
         </div>
       </div>

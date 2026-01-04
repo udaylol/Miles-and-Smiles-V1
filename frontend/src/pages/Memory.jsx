@@ -1,6 +1,6 @@
 /**
  * Memory Card Matching Game Main Component
- * Main game controller with modern UI matching other games
+ * Clean, typography-driven game interface
  */
 
 import { useMemoryGame } from "../components/memory/useMemoryGame.js";
@@ -46,116 +46,100 @@ function Memory({ roomData }) {
   const totalPairs = Math.floor(cards.length / 2);
 
   return (
-    <div className="game-shell min-h-screen bg-bg font-body grain overflow-hidden">
-      {/* Background elements */}
-      <div className="fixed inset-0 geo-pattern pointer-events-none opacity-40" />
-      <div className="fixed top-20 left-[10%] w-32 h-32 rounded-full bg-violet/10 blur-3xl animate-float" />
-      <div className="fixed bottom-20 right-[10%] w-40 h-40 rounded-full bg-accent/10 blur-3xl animate-float" style={{ animationDelay: '-2s' }} />
+    <div className="game-shell min-h-screen bg-bg font-body overflow-hidden">
+      {/* Layered background */}
+      <div className="fixed inset-0 bg-gradient-to-b from-bg via-bg to-bg-deep" />
+      <div className="fixed inset-0 geo-pattern pointer-events-none opacity-30" />
+      
+      {/* Accent glow - violet for memory */}
+      <div className="fixed top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-violet/5 blur-[100px] pointer-events-none" />
       
       {/* Exit Button */}
       <ExitButton socket={socket} roomId={roomId} />
 
       {/* Main Game Container */}
-      <div className="relative min-h-screen flex flex-col px-4 sm:px-6 py-4 sm:py-6 max-w-2xl mx-auto">
+      <div className="relative min-h-screen flex flex-col px-4 sm:px-6 py-6 max-w-2xl mx-auto">
         
         {/* Header */}
-        <header className="flex-shrink-0 text-center mb-4 sm:mb-6 animate-hero">
-          <h1 className="font-display text-2xl sm:text-3xl font-semibold text-text">
-            🎴 Memory Match 🧠
-          </h1>
-          <p className="text-xs text-text-muted font-mono tracking-wider mt-1">
-            Room: {roomId}
+        <header className="flex-shrink-0 text-center mb-4">
+          <p className="text-[10px] uppercase tracking-[0.2em] text-text-muted mb-2 font-medium">
+            Room {roomId}
           </p>
+          <h1 className="font-display text-2xl sm:text-3xl font-semibold text-text tracking-tight">
+            Memory Match
+          </h1>
+          {gameStarted && winner === null && (
+            <p className="text-xs text-text-muted mt-1">{totalPairs} pairs to find</p>
+          )}
         </header>
 
-        {/* Score Bar */}
+        {/* Players - Clean horizontal layout */}
         {gameStarted && winner === null && (
-          <div className="flex items-center justify-center gap-4 sm:gap-6 mb-4 animate-fadeIn">
-            {/* Player 1 Score */}
-            <div className={`flex items-center gap-3 px-4 py-3 rounded-2xl transition-all duration-300 ${
+          <div className="flex items-stretch justify-between gap-3 mb-4">
+            {/* Player 1 */}
+            <div className={`flex-1 p-4 rounded-2xl border transition-all duration-300 ${
               currentTurn === 1 && !isProcessing
-                ? "bg-violet-soft border border-violet/30 shadow-md scale-105" 
-                : "bg-surface border border-border"
+                ? "bg-surface border-violet/40 shadow-lg shadow-violet/10" 
+                : "bg-surface/50 border-border"
             }`}>
-              <div className={`relative ${currentTurn === 1 && !isProcessing ? "animate-bounce" : ""}`} style={{ animationDuration: "1.5s" }}>
-                <div className="w-10 h-10 rounded-xl bg-violet flex items-center justify-center shadow-sm">
-                  <span className="text-white font-display font-bold">
-                    {player1Name.charAt(0).toUpperCase()}
-                  </span>
+              <div className="flex items-center gap-3">
+                <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-display text-lg font-bold ${
+                  currentTurn === 1 && !isProcessing ? "bg-violet text-white" : "bg-bg-deep text-text-muted"
+                }`}>
+                  {player1Name.charAt(0).toUpperCase()}
                 </div>
-                {myPlayerNumber === 1 && (
-                  <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald rounded-full border-2 border-surface" />
+                <div className="min-w-0 flex-1">
+                  <p className="text-[10px] uppercase tracking-wider text-text-muted">
+                    {myPlayerNumber === 1 ? "You" : "Opponent"}
+                  </p>
+                  <p className="font-display text-xl font-bold text-text">
+                    {scores[1]} <span className="text-xs font-body text-text-muted font-normal">pairs</span>
+                  </p>
+                </div>
+                {currentTurn === 1 && !isProcessing && (
+                  <div className="w-2 h-2 rounded-full bg-violet animate-pulse" />
                 )}
               </div>
-              <div className="min-w-0">
-                <div className="text-xs text-text-muted truncate max-w-[60px] font-medium">
-                  {myPlayerNumber === 1 ? "You" : player1Name}
-                </div>
-                <div className="font-display text-xl font-bold text-violet">
-                  {scores[1]} <span className="text-xs text-text-muted">pairs</span>
-                </div>
-              </div>
             </div>
             
-            <div className="flex flex-col items-center">
-              <span className="text-text-muted text-xs font-display font-medium">VS</span>
-              <span className="text-[10px] text-text-muted mt-0.5">{totalPairs} pairs</span>
-            </div>
-            
-            {/* Player 2 Score */}
-            <div className={`flex items-center gap-3 px-4 py-3 rounded-2xl transition-all duration-300 ${
+            {/* Player 2 */}
+            <div className={`flex-1 p-4 rounded-2xl border transition-all duration-300 ${
               currentTurn === 2 && !isProcessing
-                ? "bg-accent-soft border border-accent/30 shadow-md scale-105" 
-                : "bg-surface border border-border"
+                ? "bg-surface border-accent/40 shadow-lg shadow-accent/10" 
+                : "bg-surface/50 border-border"
             }`}>
-              <div className="min-w-0 text-right">
-                <div className="text-xs text-text-muted truncate max-w-[60px] font-medium">
-                  {myPlayerNumber === 2 ? "You" : player2Name}
+              <div className="flex items-center gap-3">
+                <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-display text-lg font-bold ${
+                  currentTurn === 2 && !isProcessing ? "bg-accent text-white" : "bg-bg-deep text-text-muted"
+                }`}>
+                  {player2Name.charAt(0).toUpperCase()}
                 </div>
-                <div className="font-display text-xl font-bold text-accent">
-                  {scores[2]} <span className="text-xs text-text-muted">pairs</span>
+                <div className="min-w-0 flex-1">
+                  <p className="text-[10px] uppercase tracking-wider text-text-muted">
+                    {myPlayerNumber === 2 ? "You" : "Opponent"}
+                  </p>
+                  <p className="font-display text-xl font-bold text-text">
+                    {scores[2]} <span className="text-xs font-body text-text-muted font-normal">pairs</span>
+                  </p>
                 </div>
-              </div>
-              <div className={`relative ${currentTurn === 2 && !isProcessing ? "animate-bounce" : ""}`} style={{ animationDuration: "1.5s" }}>
-                <div className="w-10 h-10 rounded-xl bg-accent flex items-center justify-center shadow-sm">
-                  <span className="text-white font-display font-bold">
-                    {player2Name.charAt(0).toUpperCase()}
-                  </span>
-                </div>
-                {myPlayerNumber === 2 && (
-                  <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald rounded-full border-2 border-surface" />
+                {currentTurn === 2 && !isProcessing && (
+                  <div className="w-2 h-2 rounded-full bg-accent animate-pulse" />
                 )}
               </div>
             </div>
           </div>
         )}
 
-        {/* Turn Indicator */}
+        {/* Turn Indicator - Minimal */}
         {gameStarted && winner === null && (
           <div className="text-center mb-4">
-            <div className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl ${
-              isMyTurn 
-                ? "bg-violet-soft text-violet border border-violet/20" 
-                : "bg-bg-deep text-text-secondary border border-border"
-            }`}>
-              {isMyTurn ? (
-                <>
-                  <span className="w-2 h-2 rounded-full bg-violet animate-pulse" />
-                  <span className="font-medium text-sm">Your turn - find a match!</span>
-                </>
-              ) : (
-                <>
-                  <span className="w-2 h-2 rounded-full bg-text-muted" />
-                  <span className="font-medium text-sm">{playerInfo[opponentNumber]?.username || "Opponent"}'s turn</span>
-                </>
-              )}
-            </div>
+            <p className={`text-sm font-medium ${isMyTurn ? "text-violet" : "text-text-muted"}`}>
+              {isMyTurn ? "Your turn" : `${playerInfo[opponentNumber]?.username || "Opponent"}'s turn`}
+            </p>
             
             {/* Match notification */}
             {lastFlip?.isMatch && showingMatch && (
-              <div className="mt-2 text-emerald font-medium animate-bounce">
-                ✨ Match found! +1 pair
-              </div>
+              <p className="mt-1 text-emerald text-sm font-medium">Match found!</p>
             )}
           </div>
         )}
@@ -188,13 +172,6 @@ function Memory({ roomData }) {
             disabled={!isMyTurn || isProcessing}
             showingMatch={showingMatch}
           />
-        )}
-
-        {/* Hint Section */}
-        {gameStarted && winner === null && (
-          <div className="mt-4 text-center text-xs text-text-muted">
-            <p>Flip two cards to find matching pairs. Match to keep playing!</p>
-          </div>
         )}
       </div>
 

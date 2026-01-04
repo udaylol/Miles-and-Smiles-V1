@@ -140,8 +140,8 @@ function FloatingChat({ socket, roomId }) {
                 disabled={!inputValue.trim()}
                 className="px-4 py-2 rounded-xl bg-emerald text-white font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:shadow-glow transition-all"
               >
-                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
                 </svg>
               </button>
             </div>

@@ -46,8 +46,13 @@ const GameCard = ({ image, title }) => {
   };
 
   const navigateToGame = () => {
-    const path = "/games/" + title.toLowerCase().replace(/\s+/g, "-");
-    navigate(path);
+    // Chess has its own dedicated route
+    if (title.toLowerCase() === "chess") {
+      navigate("/chess");
+    } else {
+      const path = "/games/" + title.toLowerCase().replace(/\s+/g, "-");
+      navigate(path);
+    }
   };
 
   const handlePlayFromModal = () => {
@@ -90,67 +95,61 @@ const GameCard = ({ image, title }) => {
   return (
     <div
       onClick={handleClick}
-      className="group card cursor-pointer animate-stagger overflow-hidden"
+      className="group cursor-pointer rounded-2xl bg-surface border border-border overflow-hidden hover:border-accent/40 hover:shadow-lg transition-all duration-300"
     >
-      {/* Image Container */}
-      <div className="relative w-full aspect-[4/3] overflow-hidden bg-bg-deep">
+      {/* Image Container - Compact */}
+      <div className="relative w-full aspect-[16/10] overflow-hidden bg-bg-deep">
         <img
           src={image}
           alt={title}
-          className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+          className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-110"
         />
-        {/* Gradient Overlay - accent tinted */}
-        <div className="absolute inset-0 bg-gradient-to-t from-[#1A1714]/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+        {/* Gradient Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-[#1A1714]/90 via-[#1A1714]/20 to-transparent" />
         
-        {/* Play Button Overlay - bigger, bolder */}
-        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-500">
-          <div className="w-16 h-16 rounded-full bg-accent flex items-center justify-center shadow-lg shadow-accent/30 transform scale-75 group-hover:scale-100 transition-all duration-500 animate-glow">
-            <svg className="w-7 h-7 text-white ml-1" fill="currentColor" viewBox="0 0 24 24">
+        {/* Play Button - compact, subtle */}
+        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300">
+          <div className="w-12 h-12 rounded-full bg-accent/90 backdrop-blur-sm flex items-center justify-center shadow-lg transform scale-50 group-hover:scale-100 transition-all duration-300">
+            <svg className="w-5 h-5 text-white ml-0.5" fill="currentColor" viewBox="0 0 24 24">
               <path d="M8 5v14l11-7z" />
             </svg>
           </div>
         </div>
         
-        {/* Favorite Badge (if favorited) */}
+        {/* Title overlay on image */}
+        <div className="absolute bottom-0 left-0 right-0 p-3">
+          <div className="flex items-center justify-between gap-2">
+            <h2 className="font-display text-lg font-semibold text-white truncate drop-shadow-lg">
+              {title}
+            </h2>
+            <button
+              onClick={handleStarClick}
+              className={`p-2 rounded-lg transition-all duration-200 flex-shrink-0 cursor-pointer ${
+                isFavorited 
+                  ? "bg-amber text-amber shadow-lg shadow-amber/30 hover:bg-amber/80" 
+                  : "bg-black/40 backdrop-blur-sm text-white/70 hover:bg-black/60 hover:text-white"
+              }`}
+              title={isFavorited ? "Remove from favorites" : "Add to favorites"}
+            >
+              <Star
+                className={`${
+                  isFavorited
+                    ? "fill-yellow-300 text-yellow-300"
+                    : ""
+                } transition-colors duration-200`}
+                size={16}
+              />
+            </button>
+          </div>
+        </div>
+        
+        {/* Favorite Badge - Top left corner */}
         {isFavorited && (
-          <div className="absolute top-3 left-3 tag tag-amber shadow-lg">
-            <Star size={12} className="fill-current" />
+          <div className="absolute top-2 left-2 px-2 py-1 rounded-md bg-amber text-[10px] font-bold text-white uppercase tracking-wide flex items-center gap-1 shadow-lg">
+            <Star size={10} className="fill-current" />
             Favorite
           </div>
         )}
-      </div>
-
-      {/* Content */}
-      <div className="p-5">
-        <div className="flex items-center justify-between gap-3">
-          <h2 className="font-display text-xl font-semibold text-text truncate">
-            {title}
-          </h2>
-          <button
-            onClick={handleStarClick}
-            className={`p-2.5 rounded-xl transition-all duration-200 flex-shrink-0 cursor-pointer ${
-              isFavorited 
-                ? "bg-amber-soft hover:bg-amber/20" 
-                : "bg-bg-deep hover:bg-accent-soft"
-            }`}
-            title={isFavorited ? "Remove from favorites" : "Add to favorites"}
-          >
-            <Star
-              className={`${
-                isFavorited
-                  ? "fill-amber text-amber"
-                  : "text-text-muted group-hover:text-accent"
-              } transition-colors duration-200`}
-              size={18}
-            />
-          </button>
-        </div>
-        
-        {/* Play text */}
-        <p className="mt-3 text-sm text-text-secondary flex items-center gap-2">
-          <span className="w-2 h-2 rounded-full bg-emerald animate-pulse" />
-          Ready to play
-        </p>
       </div>
 
       {/* Game History Modal */}

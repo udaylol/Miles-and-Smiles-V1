@@ -1,3 +1,8 @@
+/**
+ * Dots & Boxes Main Component
+ * Clean, typography-driven game interface
+ */
+
 import { useDotsAndBoxesGame } from "../components/dotsandboxes/useDotsAndBoxesGame.js";
 import Board from "../components/dotsandboxes/Board.jsx";
 import ScoreBoard from "../components/dotsandboxes/ScoreBoard.jsx";
@@ -34,26 +39,28 @@ function DotsAndBoxes({ roomData }) {
   } = useDotsAndBoxesGame(socket, roomId);
 
   return (
-    <div className="game-shell min-h-screen bg-bg font-body grain overflow-hidden">
-      {/* Background elements */}
-      <div className="fixed inset-0 geo-pattern pointer-events-none opacity-40" />
-      <div className="fixed top-20 left-[10%] w-32 h-32 rounded-full bg-violet/10 blur-3xl animate-float" />
-      <div className="fixed bottom-20 right-[10%] w-40 h-40 rounded-full bg-amber/10 blur-3xl animate-float" style={{ animationDelay: '-2s' }} />
+    <div className="game-shell min-h-screen bg-bg font-body overflow-hidden">
+      {/* Layered background */}
+      <div className="fixed inset-0 bg-gradient-to-b from-bg via-bg to-bg-deep" />
+      <div className="fixed inset-0 geo-pattern pointer-events-none opacity-30" />
+      
+      {/* Accent glow */}
+      <div className="fixed top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-amber/5 blur-[100px] pointer-events-none" />
       
       {/* Exit Button */}
       <ExitButton socket={socket} roomId={roomId} />
 
-      {/* Main Game Container - Flexbox for vertical centering */}
-      <div className="relative h-screen flex flex-col px-4 sm:px-6 py-4 sm:py-6 max-w-xl mx-auto">
+      {/* Main Game Container */}
+      <div className="relative min-h-screen flex flex-col px-4 sm:px-6 py-6 max-w-xl mx-auto">
         
         {/* Header */}
-        <header className="flex-shrink-0 text-center mb-3 sm:mb-4 animate-hero">
-          <h1 className="font-display text-xl sm:text-2xl font-semibold text-text">
+        <header className="flex-shrink-0 text-center mb-4">
+          <p className="text-[10px] uppercase tracking-[0.2em] text-text-muted mb-2 font-medium">
+            Room {roomId}
+          </p>
+          <h1 className="font-display text-2xl sm:text-3xl font-semibold text-text tracking-tight">
             Dots & Boxes
           </h1>
-          <p className="text-xs text-text-muted font-mono tracking-wider mt-1">
-            {roomId}
-          </p>
         </header>
 
         {/* Game Info - Shows waiting/reconnecting/gameover states */}
@@ -93,8 +100,8 @@ function DotsAndBoxes({ roomData }) {
               onPlayAgain={handlePlayAgain}
             />
 
-            {/* Score Board - Compact horizontal layout */}
-            <div className="flex-shrink-0 mb-2 sm:mb-3">
+            {/* Score Board */}
+            <div className="flex-shrink-0 mb-3">
               <ScoreBoard
                 scores={scores}
                 myPlayerNumber={myPlayerNumber}
@@ -106,7 +113,7 @@ function DotsAndBoxes({ roomData }) {
               />
             </div>
 
-            {/* Game Board - Takes remaining space, centered */}
+            {/* Game Board */}
             <Board
               rows={rows}
               cols={cols}
@@ -122,7 +129,7 @@ function DotsAndBoxes({ roomData }) {
           </>
         )}
 
-        {/* Score shown during game over for context */}
+        {/* Score shown during game over */}
         {gameStarted && gameOver && (
           <div className="flex-shrink-0 mb-4 opacity-60">
             <ScoreBoard

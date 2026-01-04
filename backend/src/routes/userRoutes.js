@@ -1,8 +1,16 @@
+/**
+ * User Routes
+ * Handles user profile, friends, favorites, and game stats
+ */
+
 import { Router } from "express";
-import { getFavorites, toggleFavorite, getGameStats, getGameHistory } from "../controllers/userController.js";
 import { verifyToken } from "../middlewares/authMiddleware.js";
 import upload from "../middlewares/uploadMiddleware.js";
+
+// Import from modular user controllers
 import {
+  getKing,
+  getMe,
   updateProfilePicture,
   updateField,
   sendFriendRequest,
@@ -10,32 +18,38 @@ import {
   rejectFriendRequest,
   cancelFriendRequest,
   removeFriend,
-  getMe,
-  getKing,
-} from "../controllers/userController.js";
+  getFavorites,
+  toggleFavorite,
+  getGameStats,
+  getGameHistory,
+} from "../controllers/user/index.js";
 
 const router = Router();
 
-router.get("/me", verifyToken, getMe);
+// ============================================
+// Profile Routes
+// ============================================
+router.get("/me", verifyToken, getMe);           // Get current user
+router.get("/king", getKing);                     // Get featured user
+router.put("/updateField", verifyToken, updateField);
+router.post("/profile-picture", verifyToken, upload.single("image"), updateProfilePicture);
 
-router.get("/king", getKing);
-router.get("/favorites", verifyToken, getFavorites);
-router.get("/stats", verifyToken, getGameStats);
-router.get("/history/:gameName", verifyToken, getGameHistory);
-
-router.post("/favorites", verifyToken, toggleFavorite);
+// ============================================
+// Friends Routes
+// ============================================
 router.post("/friends", verifyToken, sendFriendRequest);
 router.post("/friends/accept", verifyToken, acceptFriendRequest);
 router.post("/friends/reject", verifyToken, rejectFriendRequest);
 router.post("/friends/cancel", verifyToken, cancelFriendRequest);
 router.post("/friends/remove", verifyToken, removeFriend);
-router.post(
-  "/profile-picture",
-  verifyToken,
-  upload.single("image"),
-  updateProfilePicture
-);
 
-router.put("/updateField", verifyToken, updateField);
+// ============================================
+// Favorites & Stats Routes
+// ============================================
+router.get("/favorites", verifyToken, getFavorites);
+router.post("/favorites", verifyToken, toggleFavorite);
+router.get("/stats", verifyToken, getGameStats);
+router.get("/history/:gameName", verifyToken, getGameHistory);
+
 export default router;
 
